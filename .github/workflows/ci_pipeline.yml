@@ -1,0 +1,89 @@
+name: CI Pipeline with security
+
+on:
+  push:
+    branches:
+      - main
+      - trunk
+      - feature/ci/cd
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci_pipeline:
+    runs-on: ubuntu-24.04
+
+    env:
+      MARIADB_ROOT_PASSWORD: nbahub_root_password
+      MARIADB_DATABASE: nbahubdb_test
+      MARIADB_TEST_DATABASE: nbahubdb_test
+      MARIADB_USER: nbahub_user
+      MARIADB_PASSWORD: nbahub_password
+      MARIADB_HOSTNAME: 127.0.0.1
+      MARIADB_PORT: 3306
+      FLASK_ENV: testing
+
+    services:
+      # MariaDB service container for integration tests
+      mariadb:
+        image: mariadb:12.0.2
+        env:
+          MARIADB_ROOT_PASSWORD: ${{ env.MARIADB_ROOT_PASSWORD }}
+          MARIADB_DATABASE: ${{ env.MARIADB_DATABASE }}
+          MARIADB_USER: ${{ env.MARIADB_USER }}
+          MARIADB_PASSWORD: ${{ env.MARIADB_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -u root -p$MARIADB_ROOT_PASSWORD"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      
+      # Step 1: Checkout the repository code
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # Step 2: Set up Python environment (version 3.12)
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          
+      # Step 3: Hadolint checks Dockerfile.render
+      - name: Lint Dockerfile with Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/images/Dockerfile.render
+        continue-on-error: true
+
+      # Step 4: Remove local editable mode for rosemary dependency
+      - name: Delete rosemary editable mode
+        run: sed -i '/rosemary @ file:\/\/\/app/d' requirements.txt
+
+      # Step 5: Install Python dependencies (incluyendo safety y pytest-cov)
+      - name: Install dependencies and security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install safety pytest-cov
+
+      # Step 6: Dependencies analisis (safety)
+      - name: Run Safety Scan (using API Key)
+        env:
+          SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+        run: safety scan -r requirements.txt --full-report || true
+        
+      # Step 7: Run the pytest test suite and generate coverage report
+      - name: Run Tests and Generate Coverage Report
+        run: pytest app/modules/ --ignore-glob='*selenium*' --cov=app --cov-report=xml
+      
+      # Step 8: Create Codacy report
+      - name: Codacy Coverage Reporter
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage.xml
