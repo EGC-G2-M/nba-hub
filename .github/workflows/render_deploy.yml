@@ -1,0 +1,28 @@
+name: Deploy to Render
+# 1. El workflow se dispara cuando otro workflow ha completado su ejecución
+on:
+  workflow_run:
+    # 2. Especificamos que debe observar el workflow con este nombre
+    workflows: ["CI Pipeline with security"]
+    # 3. Y solo si el evento es de tipo 'completed'
+    types: [completed]
+    # 4. Y solo para la rama main
+    branches: [main]
+
+jobs:
+  deploy:
+    # 5. Condición CRÍTICA: El job SÓLO se ejecutará si el workflow anterior fue 'success'
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out the repo (Necesario para el contexto de curl)
+        uses: actions/checkout@v4
+
+      - name: Deploy to Render using Deploy Hook
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_WEBHOOK }}
+        run: |
+          echo "Triggering Render deployment..."
+          curl "$deploy_url"
