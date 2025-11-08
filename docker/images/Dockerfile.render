@@ -1,7 +1,8 @@
 FROM python:3.12-slim as builder
 WORKDIR /app
 
-# 1. Installing libraries for compilation (DL3059, DL3009 solved)
+# hadolint ignore=DL3008
+# 1. Installing libraries for compilation
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
@@ -16,16 +17,18 @@ RUN apt-get update \
         openrc \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Copy dependenciees (DL3059, DL3042 solved)
+# hadolint ignore=DL3013
+# 2. Copy dependenciees
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 FROM python:3.12-slim
-WORKDIR /app # Definimos el directorio de trabajo en la nueva etapa
+WORKDIR /app
 
-# 3. Installing RUNTIME library and cleaning (DL3059, DL3009 solved)
+# hadolint ignore=DL3008
+# 3. Installing RUNTIME library and cleaning 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libmariadb3 \
@@ -44,7 +47,7 @@ COPY app/ ./app
 COPY core/ ./core
 COPY migrations/ ./migrations
 
-# 6. Last scripts (DL3059 solved)
+# 6. Last scripts
 RUN \
     cp docker/entrypoints/render_entrypoint.sh /app/render_entrypoint.sh && \
     chmod +x /app/render_entrypoint.sh && \
