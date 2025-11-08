@@ -1,50 +1,61 @@
-# Use an official Python runtime as a parent image, Alpine version for a lighter footprint
-FROM python:3.12-slim
-
-# Install necessary packages
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends mariadb-client \
-    && apt-get install -y --no-install-recommends gcc libc-dev python3-dev libffi-dev \
-    && apt-get install -y --no-install-recommends curl \
-    && apt-get install -y --no-install-recommends bash \
-    && apt-get install -y --no-install-recommends openrc \
-    && apt-get install -y --no-install-recommends build-essential 
-
-# Clean up
-RUN apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set the working directory in the container to /app
+FROM python:3.12-slim as builder
 WORKDIR /app
 
-# Copy files
+# 1. Installing libraries for compilation (DL3059, DL3009 solved)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc \
+        libc-dev \
+        python3-dev \
+        libffi-dev \
+        libmariadb-dev \
+        mariadb-client \
+        curl \
+        bash \
+        openrc \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Copy dependenciees (DL3059, DL3042 solved)
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.12-slim
+WORKDIR /app # Definimos el directorio de trabajo en la nueva etapa
+
+# 3. Installing RUNTIME library and cleaning (DL3059, DL3009 solved)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libmariadb3 \
+        curl \
+        bash \
+        openrc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# 4. Copy python packages installed from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# 5. Copy code
 COPY app/ ./app
 COPY core/ ./core
 COPY migrations/ ./migrations
 
-# Copy requirements.txt into the working directory /app
-COPY requirements.txt .
-
-# Removes cache at the build stage
-RUN find . -type d -name "__pycache__" -exec rm -r {} + && \
+# 6. Last scripts (DL3059 solved)
+RUN \
+    cp docker/entrypoints/render_entrypoint.sh /app/render_entrypoint.sh && \
+    chmod +x /app/render_entrypoint.sh && \
+    \
+    cp scripts/wait-for-db.sh /app/scripts/wait-for-db.sh && \
+    chmod +x /app/scripts/wait-for-db.sh && \
+    \
+    echo "webhook" > /app/.moduleignore && \
+    \
+    find . -type d -name "__pycache__" -exec rm -r {} + && \
     find . -type f -name "*.pyc" -exec rm -f {} +
-
-# Copy entrypoint and set execution permissions
-COPY docker/entrypoints/render_entrypoint.sh /app/render_entrypoint.sh
-RUN chmod +x /app/render_entrypoint.sh
-
-# Copy the wait-for-db.sh script and set execution permissions
-COPY scripts/wait-for-db.sh /app/scripts/wait-for-db.sh
-RUN chmod +x /app/scripts/wait-for-db.sh
-
-# Create the .moduleignore file with the module 'webhook' inside
-RUN echo "webhook" > /app/.moduleignore
-
-# Update pip
-RUN pip install --no-cache-dir --upgrade pip
-
-# Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
 
 # Expose port 80
 EXPOSE 80
