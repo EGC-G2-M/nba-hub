@@ -13341,7 +13341,7 @@ screen and (-ms-high-contrast:active) {
 
 .sidebar,
 .sidebar-content {
-    background: #222e3c;
+    background: #090030;
     transition: margin-left .35s ease-in-out, left .35s ease-in-out, margin-right .35s ease-in-out, right .35s ease-in-out
 }
 
@@ -13360,7 +13360,7 @@ screen and (-ms-high-contrast:active) {
 
 .sidebar-link,
 a.sidebar-link {
-    background: #222e3c;
+    background: #090030;
     border-left: 3px solid transparent;
     color: rgba(233, 236, 239, .5);
     cursor: pointer;
@@ -13385,7 +13385,7 @@ a.sidebar-link svg {
 }
 
 .sidebar-link:hover {
-    background: #222e3c;
+    background: #05256D;
     border-left-color: transparent
 }
 
@@ -13545,7 +13545,7 @@ a {
 
 .wrapper {
     align-items: stretch;
-    background: #222e3c;
+    background: #00253D;
     display: flex;
     width: 100%
 }
