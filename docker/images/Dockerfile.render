@@ -47,16 +47,15 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY app/ ./app
 COPY core/ ./core
 COPY migrations/ ./migrations
+COPY docker/entrypoints/render_entrypoint.sh .
+COPY scripts/wait-for-db.sh .
 
 # 6. Last scripts
 RUN \
-    cp docker/entrypoints/render_entrypoint.sh /app/render_entrypoint.sh && \
-    chmod +x /app/render_entrypoint.sh && \
+    chmod +x render_entrypoint.sh && \
+    chmod +x wait-for-db.sh && \
     \
-    cp scripts/wait-for-db.sh /app/scripts/wait-for-db.sh && \
-    chmod +x /app/scripts/wait-for-db.sh && \
-    \
-    echo "webhook" > /app/.moduleignore && \
+    echo "webhook" > .moduleignore && \
     \
     find . -type d -name "__pycache__" -exec rm -r {} + && \
     find . -type f -name "*.pyc" -exec rm -f {} +
