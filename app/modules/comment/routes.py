@@ -39,6 +39,97 @@ def admin_required(f):
     return decorated_function
 
 # COMMENT, DELETE AND VOTE  
+@comment_bp.route("/create", methods=["POST"])
+@login_required
+def create_comment():    
+    form = CommentForm()
+    dataset_id = form.dataset_id.data 
+    
+    redirect_url = url_for("public.index")
+    if dataset_id and dataset_service.find_by_id(dataset_id):
+        redirect_url = url_for("dataset.subdomain_index", doi=dataset_service.find_by_id(dataset_id).doi)
+
+    if form.validate_on_submit():
+        parent_id = form.parent_id.data if form.parent_id.data and form.parent_id.data.isdigit() else None
+        try:
+            comment_service.create_comment(
+                dataset_id=dataset_id,
+                user_id=current_user.id,
+                content=form.content.data,
+                parent_id=parent_id
+            )
+            flash("Comment posted successfully!", "success")
+        except Exception as exc:
+            flash(f"Error creating comment: {exc}", "danger")
+
+    if form.errors:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Error in {field}: {error}", "danger")
+                
+    return redirect(redirect_url)
+
+
+@comment_bp.route("/<int:comment_id>/delete", methods=["POST"])
+@login_required
+def delete_comment_route(comment_id):
+    dataset_id = None
+    redirect_url = url_for("public.index")
+
+    try:
+        is_admin_user = getattr(current_user, 'is_admin', False)
+        
+        comment = comment_service.find_by_id(comment_id)
+        if not comment:
+            raise NotFound("Comment not found.")
+
+        dataset_id = comment.dataset_id
+
+        comment_service.delete_comment(
+            comment_id=comment_id, 
+            current_user_id=current_user.id, 
+            is_admin=is_admin_user
+        )
+        flash("Comment deleted successfully.", "success")
+        
+        dataset = dataset_service.find_by_id(dataset_id)
+        if dataset and dataset.doi:
+             redirect_url = url_for("dataset.subdomain_index", doi=dataset.doi)
+
+    except (PermissionError, NotFound, ValueError) as exc:
+        flash(f"Error deleting comment: {exc}", "danger")
+        if dataset_id:
+             redirect_url = url_for("dataset.subdomain_index", doi=dataset_service.find_by_id(dataset_id).doi)
+    except Exception:
+        flash("An unexpected error occurred while deleting the comment.", "danger")
+        
+    return redirect(redirect_url)
+
+
+@comment_bp.route("/<int:comment_id>/vote", methods=["POST"])
+@login_required
+def toggle_vote_route(comment_id):
+    data = request.get_json()
+    vote_type = data.get('vote_type')
+    
+    if vote_type not in [VOTE_LIKE, VOTE_DISLIKE]:
+        raise BadRequest("Invalid vote type provided.")
+
+    try:
+        updated_comment = comment_service.toggle_vote(
+            comment_id=comment_id,
+            user_id=current_user.id,
+            new_vote_type=vote_type
+        )
+        
+        return jsonify({
+            "success": True,
+            "likes": updated_comment.likes,
+            "dislikes": updated_comment.dislikes
+        }), 200
+
+    except Exception as exc:
+        return jsonify({"success": False, "message": str(exc)}), 400
 
 # MANAGE COMMENTS BY ADMIN
 @comment_bp.route('/<int:comment_id>/pin', methods=['POST'])
