@@ -19,3 +19,12 @@ class UserRepository(BaseRepository):
 
     def get_by_email(self, email: str):
         return self.model.query.filter_by(email=email).first()
+
+    def save_changes(self, user_instance):
+        try:
+            self.session.add(user_instance)
+            self.session.commit()
+            return user_instance
+        except Exception:
+            self.session.rollback()
+            raise
