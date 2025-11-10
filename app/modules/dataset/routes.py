@@ -20,6 +20,7 @@ from flask import (
 from flask_login import current_user, login_required
 
 from app.modules.dataset import dataset_bp
+
 from app.modules.dataset.forms import DataSetForm
 from app.modules.dataset.models import DSDownloadRecord
 from app.modules.dataset.services import (
@@ -30,7 +31,7 @@ from app.modules.dataset.services import (
     DSMetaDataService,
     DSViewRecordService,
 )
-from app.modules.zenodo.services import ZenodoService
+# from app.modules.zenodo.services import ZenodoService
 from app.modules.fakenodo.services import FakenodoService
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ logger = logging.getLogger(__name__)
 dataset_service = DataSetService()
 author_service = AuthorService()
 dsmetadata_service = DSMetaDataService()
-zenodo_service = ZenodoService()
+# zenodo_service = ZenodoService()
 fakenodo_service = FakenodoService()
 doi_mapping_service = DOIMappingService()
 ds_view_record_service = DSViewRecordService()

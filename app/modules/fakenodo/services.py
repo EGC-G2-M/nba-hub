@@ -2,6 +2,10 @@ from app.modules.fakenodo.repositories import FakenodoRepository
 from core.services.BaseService import BaseService
 from app.modules.dataset.models import DataSet
 from app.modules.featuremodel.models import FeatureModel
+from core.configuration.configuration import uploads_folder_name
+from flask_login import current_user
+import requests
+import os
 
 
 class FakenodoService(BaseService):
@@ -53,14 +57,20 @@ class FakenodoService(BaseService):
         """
         uvl_filename = feature_model.fm_meta_data.uvl_filename
         data = {"name": uvl_filename}
-        # user_id = current_user.id if user is None else user.id
-        # file_path = os.path.join(uploads_folder_name(), f"user_{str(user_id)}", f"dataset_{dataset.id}/", uvl_filename)
-        # files = {"file": open(file_path, "rb")}
+        user_id = current_user.id if user is None else user.id
+        file_path = os.path.join(uploads_folder_name(), f"user_{str(user_id)}", f"dataset_{dataset.id}/", uvl_filename)
+        files = {"file": open(file_path, "rb")}
 
-        # publish_url = f"{self.ZENODO_API_URL}/{deposition_id}/files"
-        # response = requests.post(publish_url, params=self.params, data=data, files=files)
-        response = data
-        response['status_code'] = 201
+        INVENTED_URL = 'hola'
+        publish_url = f"{INVENTED_URL}/{deposition_id}/files"
+        response = requests.post(publish_url, params=self.params, data=data, files=files)
+        response = {
+            'data': data,
+            'user_id': user_id,
+            'file_path': file_path,
+            'files': files,
+            'status_code': 201
+        }
         return response.json()
 
     def publish_deposition(self, deposition_id: int) -> dict:
