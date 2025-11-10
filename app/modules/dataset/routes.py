@@ -93,7 +93,12 @@ def create_dataset():
 
                 # update DOI
                 # deposition_doi = zenodo_service.get_doi(deposition_id)
-                # dataset_service.update_dsmetadata(dataset.ds_meta_data_id, dataset_doi=deposition_doi)
+                deposition_doi = fakenodo_service.get_doi(deposition_id)
+                dataset_service.update_dsmetadata(
+                    dataset.ds_meta_data_id,
+                    dataset_doi=deposition_doi,
+                    publication_doi=deposition_doi
+                )
             except Exception as e:
                 msg = f"it has not been possible upload feature models in Zenodo and update the DOI: {e}"
                 return jsonify({"message": msg}), 200
