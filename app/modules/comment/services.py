@@ -115,7 +115,7 @@ class CommentService(BaseService):
         db.session.commit()
         return comment
         
-    def toggle_report_status(self, comment_id: int, reported: bool) -> Comment:
+    def toggle_report(self, comment_id: int, reported: bool) -> Comment:
         comment = self.comment_repository.find_by_id(comment_id)
         if not comment:
             raise ValueError("Comment not found.")
