@@ -176,7 +176,7 @@ def toggle_hide_route(comment_id):
         return jsonify({"message": "Internal error"}), 500
 
 
-@comment_bp.route('/<int:comment_id>/report_status', methods=['POST'])
+@comment_bp.route('/<int:comment_id>/report', methods=['POST'])
 @login_required
 @admin_required
 def toggle_report_route(comment_id):
