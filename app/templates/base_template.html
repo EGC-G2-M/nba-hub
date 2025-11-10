@@ -120,6 +120,13 @@ chico sundermann">
                                 class="align-middle">Edit profile</span>
                         </a>
                     </li>
+                    
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'auth.enable_two_factor' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('auth.enable_two_factor') }}">
+                            <i class="align-middle" data-feather="lock"></i> <span
+                                class="align-middle">Security (2FA)</span>
+                        </a>
+                    </li>
 
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('auth.logout') }}">
