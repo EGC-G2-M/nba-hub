@@ -58,6 +58,12 @@ chico sundermann">
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ 'active' if request.endpoint == 'trendingdataset.index' else '' }}">
+                    <a class="sidebar-link" href="{{ url_for('trendingdataset.index') }}">
+                        <i class="align-middle" data-feather="trending-up"></i> <span class="align-middle">Trending Datasets</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item {{ 'active' if request.endpoint == 'explore.index' else '' }}">
                     <a class="sidebar-link" href="{{ url_for('explore.index') }}">
                         <i class="align-middle" data-feather="search"></i> <span class="align-middle">Explore</span>
