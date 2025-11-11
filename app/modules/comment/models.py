@@ -35,7 +35,7 @@ class Comment(db.Model):
         backref=db.backref('parent', remote_side=[id]), 
         lazy='dynamic',
         order_by='Comment.created_at.asc()',
-        primary_join="Comment.parent_id==Comment.id" 
+        primaryjoin="Comment.parent_id==Comment.id" 
     )
     
     votes = db.relationship(
