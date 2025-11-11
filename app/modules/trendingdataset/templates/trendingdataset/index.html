@@ -1,0 +1,71 @@
+{% extends "base_template.html" %}
+
+{% block title %}Trending Datasets{% endblock %}
+
+{% block content %}
+
+<h1 class="h3 mb-3">Trending Datasets</h1>
+
+{% if trending_datasets %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Title</th>
+                            <th>Main Author</th>
+                            <th>Community</th>
+                            <th>Downloads</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dataset in trending_datasets %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    <a href="{{ dataset.get_uvlhub_doi() }}">
+                                        {{ dataset.ds_meta_data.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if dataset.ds_meta_data.authors %}
+                                        {{ dataset.ds_meta_data.authors[0].name }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if dataset.ds_meta_data.authors[0].affiliation %}
+                                        {{ dataset.ds_meta_data.authors[0].affiliation }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ downloads[loop.index0] }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">No trending datasets found</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    There are no trending datasets for this period yet.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
