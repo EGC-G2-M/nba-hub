@@ -178,7 +178,20 @@
                 <div id="dataset_doi_uvlhub" style="display: none">
                     {{ dataset.get_uvlhub_doi() }}
                 </div>
-                
+                <div id="dataset_downloads_count">Cargando descargas...</div>
+                <script>
+                    fetch("/datasets/{{ dataset.id }}/stats")
+                        .then(response => {
+                            if (!response.ok) throw new Error('network');
+                            return response.json();
+                        })
+                        .then(data => {
+                            document.getElementById('dataset_downloads_count').textContent = 'Downloads: ' + (data.download_count);
+                        })
+                        .catch(() => {
+                            document.getElementById('dataset_downloads_count').textContent = 'Downloads: {{ dataset.get_download_count() }}';
+                        });
+                </script>
             </div>
             {% endif %}
 
@@ -297,26 +310,47 @@
                                         <li>
                                             <a class="dropdown-item" href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
                                                 UVL
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
                                             </a>
                                             <a class="dropdown-item" href="{{ url_for('flamapy.to_glencoe', file_id=file.id) }}">
                                                 Glencoe
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" href="{{ url_for('flamapy.to_cnf', file_id=file.id) }}">
                                                 DIMACS
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
                                             </a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" href="{{ url_for('flamapy.to_splot', file_id=file.id) }}">
                                                 SPLOT
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
-                                
-                                
-
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime, timezone
 from typing import Optional
+import uuid
+import pytz
 
 from flask_login import current_user
 from sqlalchemy import desc, func
@@ -23,6 +25,14 @@ class DSDownloadRecordRepository(BaseRepository):
     def total_dataset_downloads(self) -> int:
         max_id = self.model.query.with_entities(func.max(self.model.id)).scalar()
         return max_id if max_id is not None else 0
+    
+    def create_new_record(self, dataset: DataSet, user_cookie: str) -> DSDownloadRecord:
+        return self.create(
+            user_id=current_user.id if current_user.is_authenticated else None,
+            dataset_id=dataset.id,
+            download_date=datetime.now(pytz.utc),
+            download_cookie=user_cookie,
+        )
 
 
 class DSMetaDataRepository(BaseRepository):
@@ -55,6 +65,8 @@ class DSViewRecordRepository(BaseRepository):
             view_date=datetime.now(timezone.utc),
             view_cookie=user_cookie,
         )
+    def count_views_for_dataset(self, dataset: DataSet) -> int:
+        return self.model.query.filter_by(dataset_id=dataset.id).count()
 
 
 class DataSetRepository(BaseRepository):
@@ -98,6 +110,11 @@ class DataSetRepository(BaseRepository):
             .limit(5)
             .all()
         )
+    def increment_download_count(self, dataset_id: int):
+        self.session.query(DataSet).filter_by(id=dataset_id).update(
+            {DataSet.download_count: DataSet.download_count + 1}
+        )
+        self.session.commit()
 
 
 class DOIMappingRepository(BaseRepository):

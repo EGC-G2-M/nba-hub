@@ -63,7 +63,6 @@ class DSMetaData(db.Model):
     ds_metrics = db.relationship("DSMetrics", uselist=False, backref="ds_meta_data", cascade="all, delete")
     authors = db.relationship("Author", backref="ds_meta_data", lazy=True, cascade="all, delete")
 
-
 class DataSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -73,6 +72,8 @@ class DataSet(db.Model):
 
     ds_meta_data = db.relationship("DSMetaData", backref=db.backref("data_set", uselist=False))
     feature_models = db.relationship("FeatureModel", backref="data_set", lazy=True, cascade="all, delete")
+
+    download_count = db.Column(db.Integer, nullable=False, default=0)
 
     def name(self):
         return self.ds_meta_data.title
@@ -105,7 +106,8 @@ class DataSet(db.Model):
         from app.modules.dataset.services import DataSetService
 
         return DataSetService().get_uvlhub_doi(self)
-
+    def get_download_count(self) -> int:
+        return self.download_count
     def to_dict(self):
         return {
             "title": self.ds_meta_data.title,
