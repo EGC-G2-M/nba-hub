@@ -33,8 +33,7 @@ comment_serializer = Serializer(serialization_fields=COMMENT_SERIALIZATION_FIELD
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        is_admin = getattr(current_user, 'is_admin', True) 
-        if not current_user.is_authenticated or not is_admin:
+        if not current_user.is_admin:
             return jsonify({"message": "Forbidden: Administrator access required."}), 403
         return f(*args, **kwargs)
     return decorated_function
@@ -78,7 +77,7 @@ def delete_comment_route(comment_id):
     redirect_url = url_for("public.index")
 
     try:
-        is_admin_user = getattr(current_user, 'is_admin', True)
+        is_admin_user = current_user.is_admin
         
         comment = comment_service.find_by_id(comment_id)
         if not comment:

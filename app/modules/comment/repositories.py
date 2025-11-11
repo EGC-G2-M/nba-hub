@@ -34,7 +34,7 @@ class CommentRepository(BaseRepository):
             desc(self.model.created_at)
         ).all()
 
-        return comments
+        return ordered_comments
 
     def get_replies_for_comment(self, parent_comment_id: int):
         parent_comment = self.find_by_id(parent_comment_id)
