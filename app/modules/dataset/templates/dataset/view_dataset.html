@@ -302,12 +302,7 @@
                                     <a class="dropdown-item" href="javascript:void(0);"
                                         onclick="checkUVL('{{ file.id }}')">Syntax check</a>
                                 </li>
-                                <!--
-                                        <li>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.valid', file_id=file.id) }}">SAT validity check</a>
-                                        </li>
-                                        -->
-                            </ul>
+                                </ul>
                         </div>
 
                         <div class="btn-group" role="group">
@@ -416,11 +411,11 @@
             {% if current_user.is_authenticated %}
             <div class="mb-3">
                 <div class="d-flex gap-2">
-                    <a href="/datasets/{{dataset.id}}/comments/new" class="btn btn-primary flex-fill"
-                        style="border-radius: 5px;">
+                    <button type="button" class="btn btn-primary flex-fill" style="border-radius: 5px;"
+                        data-bs-toggle="modal" data-bs-target="#createCommentModal">
                         <i data-feather="edit" class="center-button-icon"></i>
                         New comment
-                    </a>
+                    </button>
                     <a href="/datasets/{{dataset.id}}/comments" class="btn btn-primary flex-fill"
                         style="border-radius: 5px;">
                         <i data-feather="eye" class="center-button-icon"></i>
@@ -445,9 +440,8 @@
 
 </div>
 
-<!-- Modal-->
 <div class="modal fade" id="fileViewerModal" tabindex="-1" aria-labelledby="fileViewerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" style="height: 80vh; display: flex; align-items: center;">
+    <div class="modal-dialog modal-lg" style="height: 80vh; display:flex">
         <div class="modal-content" style="height: 80vh;">
             <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h5 class="modal-title" id="fileViewerModalLabel">Feature model view</h5>
@@ -472,6 +466,8 @@
     </div>
 </div>
 
+
+{% include "create_comment_modal.html" %}
 <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
 
 
