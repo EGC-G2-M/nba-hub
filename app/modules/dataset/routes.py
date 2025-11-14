@@ -277,8 +277,16 @@ def view_all_comments_of_dataset(dataset_id):
         "total_comments": len(comments),
         "comments": string 
     }
+    
+    from app.modules.comment.forms import CommentForm
 
-    return jsonify(stats)
+    comment_form = CommentForm()
+    
+    return render_template("dataset/list_comments_view.html",
+                           comments=comments,
+                           dataset= dataset_service.get_or_404(dataset_id),
+                           comment_form= comment_form
+    )
 
 @dataset_bp.route("/doi/<path:doi>/", methods=["GET"])
 def subdomain_index(doi):

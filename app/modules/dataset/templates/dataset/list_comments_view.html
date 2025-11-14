@@ -1,0 +1,68 @@
+{% extends "base_template.html" %}
+
+{% block title %}Comments{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h1 class="h3 mb-0">Comments</h1>
+
+    {% if comments %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCommentModal">
+        <i data-feather="edit" class="center-button-icon"></i>
+        New comment
+    </button>
+    {% endif %}
+
+</div>
+
+{% if comments %}
+<div class=" col-12">
+    {% for comment in comments %}
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>User_id</th>
+                        <th>Content</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>{{ comment.user_id }}</td>
+                        <td>{{ comment.content }}</td>
+                        <td>{{ comment.created_at }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="col-12 col-md-6">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">No comments found</h5>
+        </div>
+        <div class="card-body">
+            <p class="card-text">
+                This dataset has no comments yet. Do you want to be the first to comment?
+            </p>
+            <button type="button" class="btn btn-primary flex-fill" style="border-radius: 5px;" data-bs-toggle="modal"
+                data-bs-target="#createCommentModal">
+                <i data-feather="edit" class="center-button-icon"></i>
+                New comment
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% include "create_comment_modal.html" %}
+
+{% endblock %}
