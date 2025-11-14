@@ -261,7 +261,7 @@ def dataset_stats(dataset_id):
     stats = {
         "download_count": dataset_service.get_download_count(dataset),
         "view_count": DSViewRecordService().dataset_view_count(dataset),
-        "comment_count": comment_service.get_dataset_parent_comments_count(dataset.id)
+        "comment_count": comment_service.get_parent_comments_for_dataset_count(dataset.id)
     }
 
     return jsonify(stats)
