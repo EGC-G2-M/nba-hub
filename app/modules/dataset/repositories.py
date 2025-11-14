@@ -73,6 +73,10 @@ class DataSetRepository(BaseRepository):
     def __init__(self):
         super().__init__(DataSet)
 
+    def find_by_id(self, dataset_id: int) -> DataSet:
+        return self.model.query.filter_by(id=dataset_id).first(
+        )
+        
     def get_synchronized(self, current_user_id: int) -> DataSet:
         return (
             self.model.query.join(DSMetaData)

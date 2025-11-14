@@ -31,6 +31,9 @@ from app.modules.dataset.services import (
     DSMetaDataService,
     DSViewRecordService,
 )
+
+from app.modules.comment.services import CommentService
+
 # from app.modules.zenodo.services import ZenodoService
 from app.modules.fakenodo.services import FakenodoService
 
@@ -44,7 +47,7 @@ dsmetadata_service = DSMetaDataService()
 fakenodo_service = FakenodoService()
 doi_mapping_service = DOIMappingService()
 ds_view_record_service = DSViewRecordService()
-
+comment_service = CommentService()
 
 @dataset_bp.route("/dataset/upload", methods=["GET", "POST"])
 @login_required
@@ -258,12 +261,37 @@ def dataset_stats(dataset_id):
     stats = {
         "download_count": dataset_service.get_download_count(dataset),
         "view_count": DSViewRecordService().dataset_view_count(dataset),
+        "comment_count": comment_service.get_parent_comments_for_dataset_count(dataset.id)
     }
 
     return jsonify(stats)
 
+@dataset_bp.route('/datasets/<int:dataset_id>/comments', methods=['GET'])
+def view_all_comments_of_dataset(dataset_id): 
+    comments = comment_service.get_parent_comments_for_dataset(dataset_id)
+    string = ""
+    for comment in comments:
+        content = comment.content
+        string += content + "                      "
+    stats = {
+        "total_comments": len(comments),
+        "comments": string 
+    }
+    
+    from app.modules.comment.forms import CommentForm
+
+    comment_form = CommentForm()
+    
+    return render_template("dataset/list_comments_view.html",
+                           comments=comments,
+                           dataset= dataset_service.get_or_404(dataset_id),
+                           comment_form= comment_form
+    )
+
 @dataset_bp.route("/doi/<path:doi>/", methods=["GET"])
 def subdomain_index(doi):
+
+    from app.modules.comment.forms import CommentForm
 
     # Check if the DOI is an old DOI
     new_doi = doi_mapping_service.get_new_doi(doi)
@@ -271,18 +299,24 @@ def subdomain_index(doi):
         # Redirect to the same path with the new DOI
         return redirect(url_for("dataset.subdomain_index", doi=new_doi), code=302)
 
-    # Try to search the dataset by the provided DOI (which should already be the new one)
     ds_meta_data = dsmetadata_service.filter_by_doi(doi)
 
     if not ds_meta_data:
         abort(404)
 
-    # Get dataset
     dataset = ds_meta_data.data_set
+    parent_comments_count= comment_service.get_parent_comments_for_dataset_count(dataset.id)
+    parent_comments= comment_service.get_parent_comments_for_dataset(dataset.id)
+    
+    comment_form = CommentForm()
 
-    # Save the cookie to the user's browser
     user_cookie = ds_view_record_service.create_cookie(dataset=dataset)
-    resp = make_response(render_template("dataset/view_dataset.html", dataset=dataset))
+    resp = make_response(render_template("dataset/view_dataset.html", 
+                            dataset=dataset, 
+                            parent_comments_count= parent_comments_count,
+                            parent_comments= parent_comments,
+                            comment_form= comment_form
+    ))
     resp.set_cookie("view_cookie", user_cookie)
 
     return resp
@@ -292,10 +326,20 @@ def subdomain_index(doi):
 @login_required
 def get_unsynchronized_dataset(dataset_id):
 
-    # Get dataset
+    from app.modules.comment.forms import CommentForm
+
     dataset = dataset_service.get_unsynchronized_dataset(current_user.id, dataset_id)
 
     if not dataset:
         abort(404)
 
-    return render_template("dataset/view_dataset.html", dataset=dataset)
+    comment_form = CommentForm()
+    parent_comments_count = comment_service.get_parent_comments_for_dataset_count(dataset.id)
+    parent_comments = comment_service.get_parent_comments_for_dataset(dataset.id)
+
+    return render_template("dataset/view_dataset.html", 
+                            dataset=dataset,
+                            parent_comments_count=parent_comments_count,
+                            parent_comments=parent_comments,
+                            comment_form=comment_form
+    )
