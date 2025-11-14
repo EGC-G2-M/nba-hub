@@ -266,8 +266,24 @@ def dataset_stats(dataset_id):
 
     return jsonify(stats)
 
+@dataset_bp.route('/datasets/<int:dataset_id>/comments', methods=['GET'])
+def view_all_comments_of_dataset(dataset_id): 
+    comments = comment_service.get_parent_comments_for_dataset(dataset_id)
+    string = ""
+    for comment in comments:
+        content = comment.content
+        string += content + "                      "
+    stats = {
+        "total_comments": len(comments),
+        "comments": string 
+    }
+
+    return jsonify(stats)
+
 @dataset_bp.route("/doi/<path:doi>/", methods=["GET"])
 def subdomain_index(doi):
+
+    from app.modules.comment.forms import CommentForm
 
     # Check if the DOI is an old DOI
     new_doi = doi_mapping_service.get_new_doi(doi)
@@ -275,23 +291,23 @@ def subdomain_index(doi):
         # Redirect to the same path with the new DOI
         return redirect(url_for("dataset.subdomain_index", doi=new_doi), code=302)
 
-    # Try to search the dataset by the provided DOI (which should already be the new one)
     ds_meta_data = dsmetadata_service.filter_by_doi(doi)
 
     if not ds_meta_data:
         abort(404)
 
-    # Get dataset
     dataset = ds_meta_data.data_set
     parent_comments_count= comment_service.get_parent_comments_for_dataset_count(dataset.id)
     parent_comments= comment_service.get_parent_comments_for_dataset(dataset.id)
+    
+    comment_form = CommentForm()
 
-    # Save the cookie to the user's browser
     user_cookie = ds_view_record_service.create_cookie(dataset=dataset)
     resp = make_response(render_template("dataset/view_dataset.html", 
                             dataset=dataset, 
                             parent_comments_count= parent_comments_count,
-                            parent_comments= parent_comments
+                            parent_comments= parent_comments,
+                            comment_form= comment_form
     ))
     resp.set_cookie("view_cookie", user_cookie)
 
@@ -302,10 +318,20 @@ def subdomain_index(doi):
 @login_required
 def get_unsynchronized_dataset(dataset_id):
 
-    # Get dataset
+    from app.modules.comment.forms import CommentForm
+
     dataset = dataset_service.get_unsynchronized_dataset(current_user.id, dataset_id)
 
     if not dataset:
         abort(404)
 
-    return render_template("dataset/view_dataset.html", dataset=dataset)
+    comment_form = CommentForm()
+    parent_comments_count = comment_service.get_parent_comments_for_dataset_count(dataset.id)
+    parent_comments = comment_service.get_parent_comments_for_dataset(dataset.id)
+
+    return render_template("dataset/view_dataset.html", 
+                            dataset=dataset,
+                            parent_comments_count=parent_comments_count,
+                            parent_comments=parent_comments,
+                            comment_form=comment_form
+    )

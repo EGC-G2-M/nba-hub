@@ -39,15 +39,15 @@ def admin_required(f):
     return decorated_function
 
 # RUTAS DE USUARIO 
-@comment_bp.route("/create", methods=["POST"])
+@comment_bp.route("/datasets/<int:dataset_id>/comments", methods=["POST"])
 @login_required
-def create_comment():    
+def create_comment(dataset_id):    
     form = CommentForm()
-    dataset_id = form.dataset_id.data 
+    form.dataset_id.data = dataset_id
     
     redirect_url = url_for("public.index")
     if dataset_id and dataset_service.find_by_id(dataset_id):
-        redirect_url = url_for("dataset.subdomain_index", doi=dataset_service.find_by_id(dataset_id).doi)
+        redirect_url = url_for('dataset.view_all_comments_of_dataset', dataset_id=dataset_id)
 
     if form.validate_on_submit():
         parent_id = form.parent_id.data if form.parent_id.data and form.parent_id.data.isdigit() else None
