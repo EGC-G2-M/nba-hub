@@ -14,10 +14,16 @@ class CommentService(BaseService):
         super().__init__(repo)
         self.comment_repository: CommentRepository = repo
 
-    
-    def get_comments_tree_for_dataset(self, dataset_id: int):
-        parent_comments = self.comment_repository.get_parent_comments_for_dataset(dataset_id)  
-        return parent_comments
+    def get_parent_comments_for_dataset(self, dataset_id: int) -> int:
+        return self.comment_repository.get_parent_comments_for_dataset(dataset_id)
+
+    def get_parent_comments_for_dataset_count(self, dataset_id: int) -> int:
+        comments = self.comment_repository.get_parent_comments_for_dataset(dataset_id)
+        return len(comments)
+
+    def get_replies_for_comment(self, parent_comment_id: int) -> int:
+        return self.comment_repository.get_replies_for_comment(parent_comment_id)
+        
     
     def create_comment(self, dataset_id: int, user_id: int, content: str, parent_id: int = None) -> Comment:        
         if not content or len(content) > 1000:

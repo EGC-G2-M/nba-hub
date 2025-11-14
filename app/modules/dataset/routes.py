@@ -31,6 +31,9 @@ from app.modules.dataset.services import (
     DSMetaDataService,
     DSViewRecordService,
 )
+
+from app.modules.comment.services import CommentService
+
 # from app.modules.zenodo.services import ZenodoService
 from app.modules.fakenodo.services import FakenodoService
 
@@ -44,7 +47,7 @@ dsmetadata_service = DSMetaDataService()
 fakenodo_service = FakenodoService()
 doi_mapping_service = DOIMappingService()
 ds_view_record_service = DSViewRecordService()
-
+comment_service = CommentService()
 
 @dataset_bp.route("/dataset/upload", methods=["GET", "POST"])
 @login_required
@@ -258,6 +261,7 @@ def dataset_stats(dataset_id):
     stats = {
         "download_count": dataset_service.get_download_count(dataset),
         "view_count": DSViewRecordService().dataset_view_count(dataset),
+        "comment_count": comment_service.get_dataset_parent_comments_count(dataset.id)
     }
 
     return jsonify(stats)
@@ -279,10 +283,16 @@ def subdomain_index(doi):
 
     # Get dataset
     dataset = ds_meta_data.data_set
+    parent_comments_count= comment_service.get_parent_comments_for_dataset_count(dataset.id)
+    parent_comments= comment_service.get_parent_comments_for_dataset(dataset.id)
 
     # Save the cookie to the user's browser
     user_cookie = ds_view_record_service.create_cookie(dataset=dataset)
-    resp = make_response(render_template("dataset/view_dataset.html", dataset=dataset))
+    resp = make_response(render_template("dataset/view_dataset.html", 
+                            dataset=dataset, 
+                            parent_comments_count= parent_comments_count,
+                            parent_comments= parent_comments
+    ))
     resp.set_cookie("view_cookie", user_cookie)
 
     return resp
