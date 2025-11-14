@@ -130,7 +130,7 @@ def upload():
     file = request.files["file"]
     temp_folder = current_user.temp_folder()
 
-    if not file or not file.filename.endswith(".uvl"):
+    if not file or not file.filename.endswith(".csv"):
         return jsonify({"message": "No valid file"}), 400
 
     # create temp folder
