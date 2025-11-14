@@ -302,7 +302,7 @@
                                     <a class="dropdown-item" href="javascript:void(0);"
                                         onclick="checkUVL('{{ file.id }}')">Syntax check</a>
                                 </li>
-                                </ul>
+                            </ul>
                         </div>
 
                         <div class="btn-group" role="group">
@@ -408,9 +408,11 @@
             {% endfor %}
             {% endif %}
 
-            {% if current_user.is_authenticated %}
+
             <div class="mb-3">
-                <div class="d-flex gap-2">
+
+                {% if current_user.is_authenticated %}
+                <div class="d-flex gap-2", style="margin-top: 15px;">
                     <button type="button" class="btn btn-primary flex-fill" style="border-radius: 5px;"
                         data-bs-toggle="modal" data-bs-target="#createCommentModal">
                         <i data-feather="edit" class="center-button-icon"></i>
@@ -419,16 +421,31 @@
                     <a href="/datasets/{{dataset.id}}/comments" class="btn btn-primary flex-fill"
                         style="border-radius: 5px;">
                         <i data-feather="eye" class="center-button-icon"></i>
+                        {% if parent_comments_count > 0%}
+                        View all comments
+                        {% else %}  
+                        Go to comments section
+                        {% endif %}
+                    </a>
+                </div>
+
+                {% else %}
+                <div class="alert alert-info">
+                    Please <a href="{{ url_for('auth.login') }}" class="alert-link">log in</a> to post a comment.
+                </div>
+
+                <div class="d-grid mb-2"> <a href="/datasets/{{dataset.id}}/comments" class="btn btn-primary"
+                        style="border-radius: 5px;">
+                        <i data-feather="eye" class="center-button-icon"></i>
                         View all comments
                     </a>
                 </div>
-            </div>
-            {% else %}
-            <div class="alert alert-info">
-                Please <a href="{{ url_for('auth.login') }}">log in</a> to post a comment.
-            </div>
-            {% endif %}
 
+                
+
+                {% endif %}
+
+            </div>
         </div>
     </div>
 </div>
