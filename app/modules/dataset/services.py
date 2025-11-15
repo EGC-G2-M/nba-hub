@@ -142,7 +142,7 @@ class DataSetService(BaseService):
     def update_dsmetadata(self, id, **kwargs):
         return self.dsmetadata_repository.update(id, **kwargs)
 
-    def get_uvlhub_doi(self, dataset: DataSet) -> str:
+    def get_nbahub_doi(self, dataset: DataSet) -> str:
         domain = os.getenv("DOMAIN", "localhost")
         return f"http://{domain}/doi/{dataset.ds_meta_data.dataset_doi}"
 
