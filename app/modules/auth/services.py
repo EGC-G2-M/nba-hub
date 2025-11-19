@@ -64,13 +64,14 @@ class AuthenticationService(BaseService):
             }
 
             user = self.create(commit=False, **user_data)
+            self.repository.session.flush()
             profile_data["user_id"] = user.id
             self.user_profile_repository.create(**profile_data)
             self.repository.session.commit()
+            return user
         except Exception as exc:
             self.repository.session.rollback()
             raise exc
-        return user
 
     def update_profile(self, user_profile_id, form):
         if form.validate():
