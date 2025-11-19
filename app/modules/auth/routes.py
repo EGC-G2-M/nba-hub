@@ -94,7 +94,7 @@ def enable_two_factor():
             return redirect(url_for("public.index"))
         else:
             flash("Código 2FA incorrecto. Intenta de nuevo.", "warning")
-            return redirect(url_for('auth/enable_two_factor'))
+            return redirect(url_for('auth.enable_two_factor'))
 
 
 @auth_bp.route('/verify-2fa', methods=['GET', 'POST'])
