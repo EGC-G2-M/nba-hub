@@ -162,22 +162,21 @@
             {% if dataset.ds_meta_data.dataset_doi %}
             <div class="card-body" style="padding-top: 0px">
 
-                <div id="dataset_doi_uvlhub" style="display: none">
-                    {{ dataset.get_uvlhub_doi() }}
+                <div id="dataset_doi_csvhub" style="display: none">
+                    {{ dataset.get_nbahub_doi() }}
                 </div>
 
-                <button type="button" class="btn doi_button btn-sm" onclick="copyText('dataset_doi_uvlhub')">
+                <button type="button" class="btn doi_button btn-sm" onclick="copyText('dataset_doi_csvhub')">
                     <span class="button_doi_id">
                         <i data-feather="clipboard" class="center-button-icon" style="cursor: pointer"></i>
                         <b>DOI</b>
                     </span>
                     <span class="doi_text">
-                        {{ dataset.get_uvlhub_doi() }}
+                        {{ dataset.get_nbahub_doi() }}
                     </span>
                 </button>
-
-                <div id="dataset_doi_uvlhub" style="display: none">
-                    {{ dataset.get_uvlhub_doi() }}
+                <div id="dataset_doi_csvhub" style="display: none">
+                    {{ dataset.get_nbahub_doi() }}
                 </div>
                 <div id="dataset_downloads_count">Cargando descargas...</div>
                 <script>
@@ -205,7 +204,7 @@
                 <h3> Related publication </h3>
 
                 David Romero-Organvidez, José A. Galindo, Chico Sundermann, Jose-Miguel Horcas, David Benavides,
-                <i>UVLHub: A feature model data repository using UVL and open science principles</i>,
+                <i>nbahub: A feature model data repository using UVL and open science principles</i>,
                 Journal of Systems and Software,
                 2024,
                 112150,
@@ -253,9 +252,8 @@
 
                 <div class="row">
                     <div class="col-12 d-flex justify-content-between align-items-center">
-                        <h4 style="margin-bottom: 0px">UVL models</h4>
-                        <h4 style="margin-bottom: 0px;"><span class="badge bg-dark">{{ dataset.get_files_count()
-                                }}</span></h4>
+                        <h4 style="margin-bottom: 0px">CSV models</h4>
+                        <h4 style="margin-bottom: 0px;"><span class="badge bg-dark">{{ dataset.get_files_count() }}</span></h4>
                     </div>
                 </div>
 
@@ -276,88 +274,81 @@
                                 <br>
                                 <small class="text-muted">({{ file.get_formatted_size() }})</small>
                             </div>
-                            <div class="col-2">
-                                <div id="check_{{ file.id }}">
+                            <div class="col-12 text-end" >
+
+                                <button onclick="viewFile('{{ file.id }}')" class="btn btn-outline-secondary btn-sm" style="border-radius: 5px;">
+                                    <i data-feather="eye"></i> View
+                                </button>
+
+                                <div class="btn-group" role="group">
+                                    <button id="btnGroupDrop{{ file.id }}" type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style=" border-radius: 5px;">
+                                        <i data-feather="check"></i> Check
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop{{ file.id }}">
+                                        <li>
+                                            <a class="dropdown-item" href="javascript:void(0);" onclick="checkCSV('{{ file.id }}')">Syntax check</a>
+                                        </li>
+                                        <!--
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('flamapy.valid', file_id=file.id) }}">SAT validity check</a>
+                                        </li>
+                                        -->
+                                    </ul>
+                                </div>
+                                
+                                <div class="btn-group" role="group">
+                                    <button id="btnGroupDropExport{{ file.id }}" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style=" border-radius: 5px;">
+                                        <i data-feather="download"></i> Export
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="btnGroupDropExport{{ file.id }}">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
+                                                CSV
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
+                                            </a>
+                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_glencoe', file_id=file.id) }}">
+                                                Glencoe
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_cnf', file_id=file.id) }}">
+                                                DIMACS
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_splot', file_id=file.id) }}">
+                                                SPLOT
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
 
 
-                    </div>
-                    <div class="col-12 text-end">
-
-                        <button onclick="viewFile('{{ file.id }}')" class="btn btn-outline-secondary btn-sm"
-                            style="border-radius: 5px;">
-                            <i data-feather="eye"></i> View
-                        </button>
-
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupDrop{{ file.id }}" type="button"
-                                class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
-                                aria-expanded="false" style=" border-radius: 5px;">
-                                <i data-feather="check"></i> Check
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop{{ file.id }}">
-                                <li>
-                                    <a class="dropdown-item" href="javascript:void(0);"
-                                        onclick="checkUVL('{{ file.id }}')">Syntax check</a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupDropExport{{ file.id }}" type="button"
-                                class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
-                                aria-expanded="false" style=" border-radius: 5px;">
-                                <i data-feather="download"></i> Export
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="btnGroupDropExport{{ file.id }}">
-                                <li>
-                                    <a class="dropdown-item"
-                                        href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
-                                        UVL
-                                        <script>
-                                            function recordCounterFile(datasetId, targetUrl) {
-                                                fetch('/file/download/' + datasetId).catch(() => { });
-                                                window.open(targetUrl, '_blank');
-                                            }
-                                        </script>
-                                    </a>
-                                    <a class="dropdown-item"
-                                        href="{{ url_for('flamapy.to_glencoe', file_id=file.id) }}">
-                                        Glencoe
-                                        <script>
-                                            function recordCounterFile(datasetId, targetUrl) {
-                                                fetch('/file/download/' + datasetId).catch(() => { });
-                                                window.open(targetUrl, '_blank');
-                                            }
-                                        </script>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('flamapy.to_cnf', file_id=file.id) }}">
-                                        DIMACS
-                                        <script>
-                                            function recordCounterFile(datasetId, targetUrl) {
-                                                fetch('/file/download/' + datasetId).catch(() => { });
-                                                window.open(targetUrl, '_blank');
-                                            }
-                                        </script>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('flamapy.to_splot', file_id=file.id) }}">
-                                        SPLOT
-                                        <script>
-                                            function recordCounterFile(datasetId, targetUrl) {
-                                                fetch('/file/download/' + datasetId).catch(() => { });
-                                                window.open(targetUrl, '_blank');
-                                            }
-                                        </script>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -516,10 +507,9 @@
     function hideLoading() {
         document.getElementById("loading").style.display = "none";
     }
-
-    function checkUVL(file_id) {
-        const outputDiv = document.getElementById('check_' + file_id);
-        outputDiv.innerHTML = ''; // Clear previous output
+    function checkCSV(file_id) {
+    const outputDiv = document.getElementById('check_' + file_id);
+    outputDiv.innerHTML = ''; // Clear previous output
 
         fetch(`/flamapy/check_uvl/${file_id}`)
             .then(response => {

@@ -30,7 +30,7 @@ class FakenodoService(BaseService):
                 for author in dataset.ds_meta_data.authors
             ],
             "keywords": (
-                ["uvlhub"] if not dataset.ds_meta_data.tags else dataset.ds_meta_data.tags.split(", ") + ["uvlhub"]
+                ["nbahub"] if not dataset.ds_meta_data.tags else dataset.ds_meta_data.tags.split(", ") + ["nbahub"]
             ),
             "access_right": "open",
             "license": "CC-BY-4.0",
@@ -58,10 +58,10 @@ class FakenodoService(BaseService):
         Returns:
             dict: The response in JSON format with the details of the uploaded file.
         """
-        uvl_filename = feature_model.fm_meta_data.uvl_filename
-        data = {"name": uvl_filename}
+        csv_filename = feature_model.fm_meta_data.csv_filename
+        data = {"name": csv_filename}
         user_id = current_user.id if user is None else user.id
-        file_path = os.path.join(uploads_folder_name(), f"user_{str(user_id)}", f"dataset_{dataset.id}/", uvl_filename)
+        file_path = os.path.join(uploads_folder_name(), f"user_{str(user_id)}", f"dataset_{dataset.id}/", csv_filename)
         files = {"file": open(file_path, "rb")}
 
         response = {
@@ -79,4 +79,4 @@ class FakenodoService(BaseService):
         return response
 
     def get_doi(self, deposition_id: int) -> str:
-        return f"10.1234/uvlhub.{deposition_id}"
+        return f"10.1234/nbahub.{deposition_id}"
