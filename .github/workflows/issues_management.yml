@@ -1,0 +1,121 @@
+name: Move to 'In progress' or 'Done' with Commit (GH CLI)
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - trunk
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  move_card_to_status:
+    runs-on: ubuntu-latest
+    
+    env:
+      GH_TOKEN: ${{ secrets.PROJECT_PAT }} 
+      
+    steps:
+      - name: Checkout del Código
+        uses: actions/checkout@v4
+      
+      - name: Configure data parameters from project
+        id: config_data
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          echo "PROJECT_ID=PVT_kwDODnc37M4BHmQ7" >> $GITHUB_ENV
+          echo "PROJECT_NUMBER=4" >> $GITHUB_ENV
+          echo "STATUS_FIELD_ID=PVTSSF_lADODnc37M4BHmQ7zg4TlUw" >> $GITHUB_ENV
+          
+          echo "IN_PROGRESS_OPTION_ID=47fc9ee4" >> $GITHUB_ENV
+          echo "DONE_OPTION_ID=98236657" >> $GITHUB_ENV 
+
+          ISSUE_NUMBER=$(echo "$COMMIT_MSG" | grep -o -E '(Refs|Closes) #[0-9]+' | grep -o -E '[0-9]+' | head -1)
+          
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "::notice::No se encontró el patrón 'Refs #N' ni 'Closes #N'. Saltando."
+            echo "issue_number=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+          
+          TARGET_STATUS_ID="" # Inicializa
+          
+          if echo "$COMMIT_MSG" | grep -q "Closes #$ISSUE_NUMBER"; then
+              TARGET_STATUS_ID="$(cat $GITHUB_ENV | grep 'DONE_OPTION_ID=' | cut -d '=' -f 2)"
+              echo "::notice::Detectado 'Closes #$ISSUE_NUMBER'. Mover a Done."
+          elif echo "$COMMIT_MSG" | grep -q "Refs #$ISSUE_NUMBER"; then
+              TARGET_STATUS_ID="$(cat $GITHUB_ENV | grep 'IN_PROGRESS_OPTION_ID=' | cut -d '=' -f 2)"
+              echo "::notice::Detectado 'Refs #$ISSUE_NUMBER'. Mover a In Progress."
+          fi
+
+          if [ -z "$TARGET_STATUS_ID" ]; then
+              echo "Error: Se detectó un número de Issue ($ISSUE_NUMBER) pero el patrón (Refs/Closes) no fue reconocido."
+              exit 1
+          fi
+
+          echo "TARGET_STATUS_ID=$TARGET_STATUS_ID" >> $GITHUB_ENV
+
+      - name: Move issue to new column on project (CLI)
+        if: steps.config_data.outputs.issue_number != ''
+        run: |
+          
+          ISSUE_NUMBER="${{ steps.config_data.outputs.issue_number }}"
+          PROJECT_ID="${{ env.PROJECT_ID }}"
+          PROJECT_NUMBER="${{ env.PROJECT_NUMBER }}"
+          STATUS_FIELD_ID="${{ env.STATUS_FIELD_ID }}"
+          TARGET_STATUS_ID="${{ env.TARGET_STATUS_ID }}"
+          OWNER="${{ github.repository_owner }}"
+          REPO_NAME="${{ github.event.repository.name }}"
+          
+          ISSUE_URL="https://github.com/$OWNER/$REPO_NAME/issues/$ISSUE_NUMBER"
+          
+          echo "Añadiendo/Verificando Issue #$ISSUE_NUMBER en el proyecto $PROJECT_NUMBER usando URL: $ISSUE_URL"
+          gh project item-add $PROJECT_NUMBER --url "$ISSUE_URL" --owner "$OWNER" || true 
+          
+          echo "Buscando Item ID para la Issue #$ISSUE_NUMBER..."
+          
+          ITEM_ID=$(gh api graphql \
+            --field query='
+              query {
+                node(id: "'"$PROJECT_ID"'") {
+                  ... on ProjectV2 {
+                    items(first: 100) {
+                      nodes {
+                        id
+                        content {
+                          __typename
+                          ... on Issue {
+                            number
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ' \
+            --field id="$PROJECT_ID" \
+            | jq -r --arg issue_num "$ISSUE_NUMBER" \
+                '.data.node.items.nodes[] | 
+                 select(.content.__typename == "Issue") | 
+                 select(.content.number == ($issue_num | tonumber)) | 
+                 .id')
+
+          if [ -z "$ITEM_ID" ] || [ "$ITEM_ID" == "null" ]; then
+            echo "Error: No se pudo encontrar el Item ID. Asegúrate de que la Issue #$ISSUE_NUMBER esté en el proyecto."
+            exit 1
+          fi
+
+          echo "Item ID encontrado: $ITEM_ID"
+          echo "Actualizando Item $ITEM_ID en el Project $PROJECT_ID con Status ID: $TARGET_STATUS_ID..."
+          
+          gh project item-edit \
+             --project-id $PROJECT_ID \
+             --id $ITEM_ID \
+             --field-id $STATUS_FIELD_ID \
+             --single-select-option-id $TARGET_STATUS_ID
+        
+          echo "Movimiento completado para Issue #$ISSUE_NUMBER."
