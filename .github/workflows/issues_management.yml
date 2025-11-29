@@ -22,9 +22,9 @@ jobs:
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          echo "PROJECT_ID=PVT_kwDODnc37M4BHmQ7" >> $GITHUB_ENV
+          echo "PROJECT_ID=PVT_kwDODnc37M4BJYAj" >> $GITHUB_ENV
           echo "PROJECT_NUMBER=4" >> $GITHUB_ENV
-          echo "STATUS_FIELD_ID=PVTSSF_lADODnc37M4BHmQ7zg4TlUw" >> $GITHUB_ENV
+          echo "STATUS_FIELD_ID=PVTSSF_lADODnc37M4BJYAjzg5jssY" >> $GITHUB_ENV
           
           echo "IN_PROGRESS_OPTION_ID=47fc9ee4" >> $GITHUB_ENV
           echo "DONE_OPTION_ID=98236657" >> $GITHUB_ENV 
