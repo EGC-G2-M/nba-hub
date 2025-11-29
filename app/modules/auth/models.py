@@ -11,8 +11,13 @@ class User(db.Model, UserMixin):
 
     email = db.Column(db.String(256), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, nullable=False, 
+                           default=lambda: datetime.now(timezone.utc))
+    two_factor_secret = db.Column(db.LargeBinary, nullable=True)
+    two_factor_enabled = db.Column(db.Boolean, default=False)
 
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    
     data_sets = db.relationship("DataSet", backref="user", lazy=True)
     profile = db.relationship("UserProfile", backref="user", uselist=False)
 

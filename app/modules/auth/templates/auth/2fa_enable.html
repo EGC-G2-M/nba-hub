@@ -1,0 +1,41 @@
+{% extends "base_template.html" %}
+
+{% block title %}Habilitar 2FA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2>Habilitar Autenticación de Dos Factores (2FA)</h2>
+            <p>Para habilitar el 2FA, sigue estos dos pasos:</p>
+
+            <div class="alert alert-info" role="alert">
+                <h4>Paso 1: Escanear el código</h4>
+                <p>Usa tu aplicación de autenticación (como Google Authenticator o Authy) para escanear el siguiente código QR.</p>
+                
+                {% if qr_base64 %}
+                    <div class="text-center my-4">
+                        <img src="data:image/png;base64,{{ qr_base64 }}" alt="Código QR 2FA">
+                    </div>
+                    <p>Si no puedes escanear el código, introduce el secreto manualmente:</p>
+                    <p><strong>Secreto:</strong> (Debes pasar el secreto sin codificar aquí si es necesario)</p>
+                {% else %}
+                    <p class="text-danger">No se pudo generar el código QR.</p>
+                {% endif %}
+            </div>
+
+            <div class="alert alert-warning" role="alert">
+                <h4>Paso 2: Verificar la activación</h4>
+                <p>Una vez escaneado, introduce el código de 6 dígitos que aparece en tu aplicación para confirmar la activación.</p>
+                <form method="POST" action="{{ url_for('auth.enable_two_factor') }}">
+                    <div class="form-group">
+                        <label for="code">Código de Verificación:</label>
+                        <input type="text" class="form-control" id="code" name="code" required maxlength="6" pattern="\d{6}">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block mt-3">Confirmar y Activar 2FA</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

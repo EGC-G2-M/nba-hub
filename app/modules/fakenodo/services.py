@@ -1,0 +1,82 @@
+from app.modules.fakenodo.repositories import FakenodoRepository
+from core.services.BaseService import BaseService
+from app.modules.dataset.models import DataSet
+from app.modules.featuremodel.models import FeatureModel
+from core.configuration.configuration import uploads_folder_name
+from flask_login import current_user
+import os
+
+
+class FakenodoService(BaseService):
+    def __init__(self):
+        super().__init__(FakenodoRepository())
+
+    def create_new_deposition(self, dataset: DataSet) -> dict:
+        metadata = {
+            "title": dataset.ds_meta_data.title,
+            "upload_type": "dataset" if dataset.ds_meta_data.publication_type.value == "none" else "publication",
+            "publication_type": (
+                dataset.ds_meta_data.publication_type.value
+                if dataset.ds_meta_data.publication_type.value != "none"
+                else None
+            ),
+            "description": dataset.ds_meta_data.description,
+            "creators": [
+                {
+                    "name": author.name,
+                    **({"affiliation": author.affiliation} if author.affiliation else {}),
+                    **({"orcid": author.orcid} if author.orcid else {}),
+                }
+                for author in dataset.ds_meta_data.authors
+            ],
+            "keywords": (
+                ["nbahub"] if not dataset.ds_meta_data.tags else dataset.ds_meta_data.tags.split(", ") + ["nbahub"]
+            ),
+            "access_right": "open",
+            "license": "CC-BY-4.0",
+        }
+
+        simulated_id = dataset.ds_meta_data_id
+
+        data = {"metadata": metadata}
+
+        response = data
+        response['status_code'] = '200'
+        response['id'] = simulated_id
+        response['conceptrecid'] = simulated_id
+        return response
+
+    def upload_file(self, dataset: DataSet, deposition_id: int, feature_model: FeatureModel, user=None) -> dict:
+        """
+        Upload a file to a deposition in Zenodo.
+
+        Args:
+            deposition_id (int): The ID of the deposition in Zenodo.
+            feature_model (FeatureModel): The FeatureModel object representing the feature model.
+            user (FeatureModel): The User object representing the file owner.
+
+        Returns:
+            dict: The response in JSON format with the details of the uploaded file.
+        """
+        csv_filename = feature_model.fm_meta_data.csv_filename
+        data = {"name": csv_filename}
+        user_id = current_user.id if user is None else user.id
+        file_path = os.path.join(uploads_folder_name(), f"user_{str(user_id)}", f"dataset_{dataset.id}/", csv_filename)
+        files = {"file": open(file_path, "rb")}
+
+        response = {
+            'data': data,
+            'user_id': user_id,
+            'file_path': file_path,
+            'status_code': 201
+        }
+        
+        files['file'].close()
+        return response
+
+    def publish_deposition(self, deposition_id: int) -> dict:
+        response = {'status_code' : 202}
+        return response
+
+    def get_doi(self, deposition_id: int) -> str:
+        return f"10.1234/nbahub.{deposition_id}"
