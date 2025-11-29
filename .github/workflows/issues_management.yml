@@ -5,8 +5,6 @@ on:
     branches-ignore:
       - main
       - trunk
-    paths-ignore:
-      - '**.md'
 
 jobs:
   move_card_to_status:
