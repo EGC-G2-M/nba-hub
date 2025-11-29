@@ -109,7 +109,7 @@ jobs:
 
           echo "Item ID encontrado: $ITEM_ID"
           echo "Actualizando Item $ITEM_ID en el Project $PROJECT_ID con Status ID: $TARGET_STATUS_ID..."
-          
+
           gh project item-edit \
              --project-id $PROJECT_ID \
              --id $ITEM_ID \
