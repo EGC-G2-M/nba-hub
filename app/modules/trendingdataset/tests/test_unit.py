@@ -40,15 +40,17 @@ def test_client(test_client):
         now = datetime.utcnow()
         records = []
 
-        # Dataset 1: 2 recent, 1 old
+        # Dataset 1: 3 recent, 1 old
         ds1 = datasets[0][0]
         records.append(DSDownloadRecord(dataset_id=ds1.id, download_date=now - timedelta(days=10), download_cookie="cookie_1a"))
         records.append(DSDownloadRecord(dataset_id=ds1.id, download_date=now - timedelta(days=5), download_cookie="cookie_1b"))
-        records.append(DSDownloadRecord(dataset_id=ds1.id, download_date=now - timedelta(days=40), download_cookie="cookie_1c"))
+        records.append(DSDownloadRecord(dataset_id=ds1.id, download_date=now - timedelta(days=15), download_cookie="cookie_1c"))
+        records.append(DSDownloadRecord(dataset_id=ds1.id, download_date=now - timedelta(days=40), download_cookie="cookie_1d"))
 
-        # Dataset 2: 1 recent
+        # Dataset 2: 2 recent
         ds2 = datasets[1][0]
         records.append(DSDownloadRecord(dataset_id=ds2.id, download_date=now - timedelta(days=2), download_cookie="cookie_2a"))
+        records.append(DSDownloadRecord(dataset_id=ds2.id, download_date=now - timedelta(days=10), download_cookie="cookie_2b"))
 
         # Dataset 3: only old downloads
         ds3 = datasets[2][0]
@@ -80,15 +82,15 @@ def test_get_top5_trending_datasets_last_30_days(test_client):
     assert len(result) > 0, "No trending datasets found"
     assert result[0][0].ds_meta_data.title == "Trending Dataset 1", "Unexpected dataset title"
     assert result[1][0].ds_meta_data.title == "Trending Dataset 2", "Unexpected dataset title"
-    assert result[0][1] == 2, "Unexpected download count"
-    assert result[1][1] == 1, "Unexpected download count"
+    assert result[0][1] == 3, "Unexpected download count"
+    assert result[1][1] == 2, "Unexpected download count"
     
 def test_no_trending_datasets_outside_30_days(test_client):
 
     trending_service = TrendingdatasetService()
     result = trending_service.get_top5_trending_datasets_last_30_days()
 
-    for dataset, download_count in result:
+    for _, download_count in result:
         assert download_count > 0, "Dataset with zero downloads found in trending datasets"
         
 def test_trending_datasets_order(test_client):
