@@ -201,12 +201,47 @@
 
             <div class="card-body">
 
-                <h3> Related Datasets </h3>
-                <a href="http://localhost/doi/10.1234/season-2023-24/"
-                    target="_blank">Season-2023-24</a>
+                <h3>Related Datasets</h3>
+                <hr>
+                {% if related_datasets %}
+                <div class="row">
+                    {% for related in related_datasets %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">
+                                    <a href="{{ url_for('dataset.subdomain_index', doi=related.ds_meta_data.dataset_doi) }}" class="text-decoration-none text-dark">
+                                        {{ related.ds_meta_data.title }}
+                                    </a>
+                                </h5>
+                                
+                                <p class="card-text small text-muted mb-2">
+                                    <i data-feather="calendar"></i> {{ related.created_at.strftime('%Y-%m-%d') }} <br>
+                                    <i data-feather="download"></i> {{ related.download_count }} downloads
+                                </p>
+
+                                <div>
+                                    {% if related.ds_meta_data.tags %}
+                                        {% for tag in related.ds_meta_data.tags.split(',')[:2] %}
+                                            <span class="badge bg-light text-dark border">{{ tag }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <a href="{{ url_for('dataset.subdomain_index', doi=related.ds_meta_data.dataset_doi) }}" class="btn btn-primary btn-sm w-100">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No related datasets found.</p>
+            {% endif %}
 
             </div>
-
 
         </div>
 
