@@ -148,6 +148,20 @@ class DataSetService(BaseService):
     def get_nbahub_doi(self, dataset: DataSet) -> str:
         domain = os.getenv("DOMAIN", "localhost")
         return f"http://{domain}/doi/{dataset.ds_meta_data.dataset_doi}"
+    
+    def get_related_datasets(self, dataset_id: int):
+        
+        dataset = self.repository.find_by_id(dataset_id)
+        if not dataset:
+            return []
+
+        tags = []
+        if dataset.ds_meta_data.tags:
+            tags = [t.strip() for t in dataset.ds_meta_data.tags.split(',') if t.strip()]
+
+        authors = [author.name for author in dataset.ds_meta_data.authors]
+
+        return self.repository.get_related_datasets(dataset_id, tags, authors)
 
 
 class AuthorService(BaseService):
