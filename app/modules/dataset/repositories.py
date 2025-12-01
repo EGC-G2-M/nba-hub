@@ -5,7 +5,7 @@ import uuid
 import pytz
 
 from flask_login import current_user
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 
 from app.modules.dataset.models import Author, DataSet, DOIMapping, DSDownloadRecord, DSMetaData, DSViewRecord
 from core.repositories.BaseRepository import BaseRepository
@@ -119,6 +119,32 @@ class DataSetRepository(BaseRepository):
             {DataSet.download_count: DataSet.download_count + 1}
         )
         self.session.commit()
+        
+    def get_related_datasets(self, dataset_id, tags_list, author_names):
+        conditions = []
+        if tags_list:
+            conditions.extend([DSMetaData.tags.ilike(f"%{tag}%") for tag in tags_list])
+            
+        if author_names:
+            conditions.extend([Author.name.ilike(f"%{name}%") for name in author_names])
+
+        if not conditions:
+            return []
+
+        return (self.model.query
+                .join(DSMetaData)
+                .outerjoin(Author, DSMetaData.id == Author.ds_meta_data_id)
+                .filter(
+                    self.model.id != dataset_id, 
+                    or_(*conditions)             
+                )
+                .distinct() 
+                .order_by(
+                    self.model.download_count.desc(), 
+                    self.model.created_at.desc()    
+                )
+                .limit(4)
+                .all())
 
 
 class DOIMappingRepository(BaseRepository):
