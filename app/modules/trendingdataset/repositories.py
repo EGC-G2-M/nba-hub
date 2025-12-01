@@ -1,4 +1,4 @@
-from app.modules.dataset.models import DataSet, DSMetaData, Author, DSDownloadRecord
+from app.modules.dataset.models import DataSet, DSDownloadRecord
 from core.repositories.BaseRepository import BaseRepository
 from datetime import datetime, timedelta
 from sqlalchemy import func
