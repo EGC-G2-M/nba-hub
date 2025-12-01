@@ -305,6 +305,7 @@ def subdomain_index(doi):
         abort(404)
 
     dataset = ds_meta_data.data_set
+    related_datasets = dataset_service.get_related_datasets(dataset.id)
     parent_comments_count= comment_service.get_parent_comments_for_dataset_count(dataset.id)
     parent_comments= comment_service.get_parent_comments_for_dataset(dataset.id)
     
@@ -315,7 +316,8 @@ def subdomain_index(doi):
                             dataset=dataset, 
                             parent_comments_count= parent_comments_count,
                             parent_comments= parent_comments,
-                            comment_form= comment_form
+                            comment_form= comment_form,
+                            related_datasets=related_datasets
     ))
     resp.set_cookie("view_cookie", user_cookie)
 
