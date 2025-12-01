@@ -222,16 +222,37 @@ def download_dataset(dataset_id):
     ).first()
 
     if not existing_record:
-        # Record the download in your database
-        DSDownloadRecordService().create(
-            user_id=current_user.id if current_user.is_authenticated else None,
-            dataset_id=dataset_id,
-            download_date=datetime.now(timezone.utc),
-            download_cookie=user_cookie,
-        )
+        DSDownloadRecordService().create_new_record(dataset=dataset, user_cookie=user_cookie)
+        dataset_service.increment_download_count(dataset_id)
 
     return resp
 
+@dataset_bp.route("/file/download/<int:dataset_id>", methods=["GET"])
+def download_file(dataset_id):
+    dataset = dataset_service.get_or_404(dataset_id)
+    user_cookie = request.cookies.get("download_cookie")
+    if not user_cookie:
+        user_cookie = str(uuid.uuid4())
+    existing_record = DSDownloadRecord.query.filter_by(
+        user_id=current_user.id if current_user.is_authenticated else None,
+        dataset_id=dataset_id,
+        download_cookie=user_cookie,
+    ).first()
+
+    if not existing_record:
+        DSDownloadRecordService().create_new_record(dataset=dataset, user_cookie=user_cookie)
+        dataset_service.increment_download_count(dataset_id)
+
+@dataset_bp.route("/datasets/<int:dataset_id>/stats", methods=["GET"])
+def dataset_stats(dataset_id):
+    dataset = dataset_service.get_or_404(dataset_id)
+
+    stats = {
+        "download_count": dataset_service.get_download_count(dataset),
+        "view_count": DSViewRecordService().dataset_view_count(dataset),
+    }
+
+    return jsonify(stats)
 
 @dataset_bp.route("/doi/<path:doi>/", methods=["GET"])
 def subdomain_index(doi):

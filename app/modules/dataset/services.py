@@ -8,7 +8,7 @@ from typing import Optional
 from flask import request
 
 from app.modules.auth.services import AuthenticationService
-from app.modules.dataset.models import DataSet, DSMetaData, DSViewRecord
+from app.modules.dataset.models import DataSet, DSMetaData, DSViewRecord, DSDownloadRecord
 from app.modules.dataset.repositories import (
     AuthorRepository,
     DataSetRepository,
@@ -91,6 +91,12 @@ class DataSetService(BaseService):
 
     def total_dataset_views(self) -> int:
         return self.dsviewrecord_repostory.total_dataset_views()
+    
+    def increment_download_count(self, dataset_id: int):
+        self.repository.increment_download_count(dataset_id)
+
+    def get_download_count(self, dataset: DataSet) -> int:
+        return dataset.get_download_count()
 
     def create_from_form(self, form, current_user) -> DataSet:
         main_author = {
@@ -150,6 +156,9 @@ class DSDownloadRecordService(BaseService):
     def __init__(self):
         super().__init__(DSDownloadRecordRepository())
 
+    def create_new_record(self, dataset: DataSet, user_cookie: str) -> DSDownloadRecord:
+
+        return self.repository.create_new_record(dataset, user_cookie)
 
 class DSMetaDataService(BaseService):
     def __init__(self):
@@ -184,6 +193,8 @@ class DSViewRecordService(BaseService):
             self.create_new_record(dataset=dataset, user_cookie=user_cookie)
 
         return user_cookie
+    def dataset_view_count(self, dataset: DataSet) -> int:
+        return self.repository.count_views_for_dataset(dataset)
 
 
 class DOIMappingService(BaseService):
