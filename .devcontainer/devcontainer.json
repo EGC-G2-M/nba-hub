@@ -54,7 +54,8 @@
       "installGlobally": true
     },
     "ghcr.io/devcontainers/features/ssh-agent:1": {
-      "installOpenSSH": true
+      "installOpenSSH": false
     }
-  }
+  },
+  "postCreateCommand": "apt-get update && apt-get install -y openssh-client"
 }
