@@ -12,9 +12,9 @@ type(scope): Very brief description
 # --- PART 2: BODY --- (Optional. Max 72 characters per line)
 # Detailed description: What, how, and why the change was made.
 
-Body of the commit message.
-Line 2.
-Line 3.
+# Body of the commit message.
+# Line 2.
+# Line 3.
 
 # --- PART 3: FOOTER --- (Optional. Issue links or BREAKING CHANGES)
 
