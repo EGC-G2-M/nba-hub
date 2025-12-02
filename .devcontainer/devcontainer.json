@@ -43,5 +43,11 @@
   "mounts": [
     "source=${localWorkspaceFolder}/uploads,target=/app/uploads,type=bind"
   ],
-  "remoteUser": "root"
+  "remoteUser": "root",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "2.34.1",
+      "installGlobally": true
+    }
+  }
 }
