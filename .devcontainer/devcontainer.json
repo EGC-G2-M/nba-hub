@@ -41,13 +41,20 @@
     "PYTHONUNBUFFERED": "1"
   },
   "mounts": [
-    "source=${localWorkspaceFolder}/uploads,target=/app/uploads,type=bind"
+    "source=${localWorkspaceFolder}/uploads,target=/app/uploads,type=bind",
+    "source=${env:SSH_AUTH_SOCK},target=/ssh-agent.sock,type=bind"
   ],
   "remoteUser": "root",
+  "containerEnv": {
+    "SSH_AUTH_SOCK": "/ssh-agent.sock"
+  },
   "features": {
     "ghcr.io/devcontainers/features/git:1": {
-      "version": "2.34.1",
+      "version": "latest",
       "installGlobally": true
+    },
+    "ghcr.io/devcontainers/features/ssh-agent:1": {
+      "installOpenSSH": true
     }
   }
 }
