@@ -1,5 +1,6 @@
 import uuid
 from flask import make_response
+from app.modules.dataset.services import DataSetService
 import pytest
 
 from app import db
@@ -121,3 +122,26 @@ def test_download_file_exist_record_and_not_increment(test_client):
     assert resp_count.status_code == 200
     count = resp_count.json["download_count"]
     assert count == 2, f"El contador no debe incrementarse, sigue siendo {count}"
+
+def test_get_top5_trending_datasets_last_30_days(test_client, trending_test_data):
+    dataset_service = DataSetService()
+    result = dataset_service.get_top5_trending_datasets_last_30_days()
+
+    assert len(result) > 0, "No trending datasets found"
+    assert result[0][0].ds_meta_data.title == "Trending Dataset 1", "Unexpected dataset title"
+    assert result[1][0].ds_meta_data.title == "Trending Dataset 2", "Unexpected dataset title"
+    assert result[0][1] == 3, "Unexpected download count"
+    assert result[1][1] == 2, "Unexpected download count"
+    
+def test_trending_datasets_order(test_client, trending_test_data):
+    dataset_service = DataSetService()
+    result = dataset_service.get_top5_trending_datasets_last_30_days()
+
+    download_counts = [download_count for _, download_count in result]
+    assert download_counts == sorted(download_counts, reverse=True), "Trending datasets are not ordered by download count"
+
+def test_trending_datasets_limit(test_client, trending_test_data):
+    dataset_service = DataSetService()
+    result = dataset_service.get_top5_trending_datasets_last_30_days()
+
+    assert len(result) <= 5, "More than 5 trending datasets returned"

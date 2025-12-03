@@ -31,3 +31,8 @@ class DatasetDownloadUser(HttpUser):
             print(f"Dataset {dataset_id} descargado correctamente.")
         else:
             print(f"Error al descargar dataset {dataset_id}: {response.status_code}")
+
+class TrendingDatasetsUser(HttpUser):
+    @task
+    def fetch_trending_datasets(self):
+        self.client.get("/dataset/trending")
