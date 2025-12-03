@@ -291,3 +291,10 @@ def get_unsynchronized_dataset(dataset_id):
         abort(404)
 
     return render_template("dataset/view_dataset.html", dataset=dataset)
+
+@dataset_bp.route("/dataset/trending", methods=["GET"])
+def trending_datasets():
+    res = dataset_service.get_top5_trending_datasets_last_30_days()
+    datasets = [d[0] for d in res]
+    downloads = [d[1] for d in res]
+    return render_template('dataset/trending_datasets.html', trending_datasets=datasets, downloads=downloads)

@@ -145,7 +145,10 @@ class DataSetService(BaseService):
     def get_uvlhub_doi(self, dataset: DataSet) -> str:
         domain = os.getenv("DOMAIN", "localhost")
         return f"http://{domain}/doi/{dataset.ds_meta_data.dataset_doi}"
-
+    
+    def get_top5_trending_datasets_last_30_days(self):
+        return self.repository.get_top5_trending_datasets_last_30_days()
+    
 
 class AuthorService(BaseService):
     def __init__(self):
