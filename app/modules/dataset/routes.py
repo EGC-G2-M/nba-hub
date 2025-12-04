@@ -333,6 +333,7 @@ def get_unsynchronized_dataset(dataset_id):
     if not dataset:
         abort(404)
 
+
     comment_form = CommentForm()
     parent_comments_count = comment_service.get_parent_comments_for_dataset_count(dataset.id)
     parent_comments = comment_service.get_parent_comments_for_dataset(dataset.id)
@@ -343,3 +344,11 @@ def get_unsynchronized_dataset(dataset_id):
                             parent_comments=parent_comments,
                             comment_form=comment_form
     )
+
+@dataset_bp.route("/dataset/trending", methods=["GET"])
+def trending_datasets():
+    res = dataset_service.get_top5_trending_datasets_last_30_days()
+    datasets = [d[0] for d in res]
+    downloads = [d[1] for d in res]
+    return render_template('dataset/trending_datasets.html', trending_datasets=datasets, downloads=downloads)
+

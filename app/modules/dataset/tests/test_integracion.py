@@ -130,3 +130,21 @@ def test_download_file_exist_record_and_not_increment(test_client):
     assert stats.json["download_count"] == 4
 
     logout(test_client)
+
+def test_get_top5_trending_datasets_last_30_days(test_client, trending_test_data):
+    response = test_client.get("/dataset/trending")
+    assert response.status_code == 200
+    assert b"Trending Dataset 1" in response.data
+    assert b"Trending Dataset 2" in response.data
+    assert b"Trending Dataset 5" in response.data
+    assert b"Trending Dataset 6" in response.data
+    assert b"Trending Dataset 8" in response.data
+    assert b"Trending Dataset 3" not in response.data
+    assert b"Trending Dataset 4" not in response.data
+    assert b"Trending Dataset 7" not in response.data    
+
+
+def test_no_trending_datasets(test_client, clean_database):
+    response = test_client.get("/dataset/trending")
+    assert response.status_code == 200
+    assert b"No trending datasets found" in response.data
