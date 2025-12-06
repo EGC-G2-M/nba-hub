@@ -14,6 +14,18 @@ function send_query() {
 
     filters.forEach(filter => {
         filter.addEventListener('input', () => {
+            
+            const startDate = document.querySelector('#start_date').value;
+            const endDate = document.querySelector('#end_date').value;
+            const dateError = document.getElementById('date_error');
+            
+            if (startDate && endDate && startDate > endDate) {
+                dateError.style.display = 'block';
+                return;
+            } else {
+                dateError.style.display = 'none';
+            }
+            
             const csrfToken = document.getElementById('csrf_token').value;
 
             const searchCriteria = {
@@ -21,6 +33,8 @@ function send_query() {
                 query: document.querySelector('#query').value,
                 publication_type: document.querySelector('#publication_type').value,
                 sorting: document.querySelector('[name="sorting"]:checked').value,
+                start_date: startDate,
+                end_date: endDate
             };
 
             console.log(document.querySelector('#publication_type').value);
@@ -178,6 +192,11 @@ function clearFilters() {
         option.checked = option.value == "newest"; // replace "default" with whatever your default value is
         // option.dispatchEvent(new Event('input', {bubbles: true}));
     });
+
+    document.querySelector('#start_date').value = "";
+    document.querySelector('#end_date').value = "";
+    
+    document.getElementById('date_error').style.display = 'none';
 
     // Perform a new search with the reset filters
     queryInput.dispatchEvent(new Event('input', {bubbles: true}));
