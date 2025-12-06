@@ -1,0 +1,28 @@
+# --- PART 1: HEADER --- (Max 50 characters. Use imperative mode. DO NOT end with a period.)
+# Format: <type>[optional scope]: <description>
+#
+# VALID TYPES:
+# feat (feature), fix (bug fix), docs (documentation), style (formatting),
+# refactor (code change, no functional change), test (tests), chore (maintenance)
+#
+# EXAMPLE: feat(login): add forgotten password link
+
+type(scope): Very brief description
+
+# --- PART 2: BODY --- (Optional. Max 72 characters per line)
+# Detailed description: What, how, and why the change was made.
+
+# Body of the commit message.
+# Line 2.
+# Line 3.
+
+# --- PART 3: FOOTER --- (Optional. Issue links or BREAKING CHANGES)
+
+# LINK ISSUE: (e.g., Refs #123, Closes #456)
+#Refs #123
+
+# CO-AUTHOR:
+# Co-authored-by: Name <email@example.com>
+
+# BREAKING CHANGE:
+# BREAKING CHANGE: Explanation of the incompatible change and how to migrate.

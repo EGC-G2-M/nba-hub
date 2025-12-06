@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 import uuid
 import pytz
@@ -119,6 +119,22 @@ class DataSetRepository(BaseRepository):
             {DataSet.download_count: DataSet.download_count + 1}
         )
         self.session.commit()
+    
+    def get_top5_trending_datasets_last_30_days(self):
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        trending_datasets = (
+            self.session.query(
+                DataSet,
+                func.count(DSDownloadRecord.id).label("download_count")
+            )
+            .join(DSDownloadRecord, DataSet.id == DSDownloadRecord.dataset_id)
+            .filter(DSDownloadRecord.download_date >= thirty_days_ago)
+            .group_by(DataSet.id)
+            .order_by(desc("download_count"), desc(DataSet.created_at))
+            .limit(5)
+            .all()
+        )
+        return trending_datasets
 
 
 class DOIMappingRepository(BaseRepository):
