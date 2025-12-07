@@ -26,7 +26,6 @@
             Explore more datasets
         </a>
     </div>
-
 </div>
 
 <div class="row">
@@ -273,9 +272,10 @@
                                 <i data-feather="file"></i> {{ file.name }}
                                 <br>
                                 <small class="text-muted">({{ file.get_formatted_size() }})</small>
+                                
                             </div>
                             <div class="col-12 text-end" >
-
+                                <div id="check_{{ file.id }}" class="mt-2 p-1"></div>
                                 <button onclick="viewFile('{{ file.id }}')" class="btn btn-outline-secondary btn-sm" style="border-radius: 5px;">
                                     <i data-feather="eye"></i> View
                                 </button>
@@ -286,7 +286,7 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="btnGroupDrop{{ file.id }}">
                                         <li>
-                                            <a class="dropdown-item" href="javascript:void(0);" onclick="checkCSV('{{ file.id }}')">Syntax check</a>
+                                            <a class="dropdown-item" href="{{ url_for('flamapy.check_csv', file_id=file.id) }}" onclick="checkCSV('{{ file.id }}'); return false;">Syntax check</a>
                                         </li>
                                         <!--
                                         <li>
@@ -295,7 +295,6 @@
                                         -->
                                     </ul>
                                 </div>
-                                
                                 <div class="btn-group" role="group">
                                     <button id="btnGroupDropExport{{ file.id }}" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style=" border-radius: 5px;">
                                         <i data-feather="download"></i> Export
@@ -304,37 +303,6 @@
                                         <li>
                                             <a class="dropdown-item" href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
                                                 CSV
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_glencoe', file_id=file.id) }}">
-                                                Glencoe
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_cnf', file_id=file.id) }}">
-                                                DIMACS
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_splot', file_id=file.id) }}">
-                                                SPLOT
                                                 <script>
                                                     function recordCounterFile(datasetId, targetUrl) {
                                                         fetch('/file/download/' + datasetId).catch(()=>{});
@@ -509,9 +477,10 @@
     }
     function checkCSV(file_id) {
     const outputDiv = document.getElementById('check_' + file_id);
+    if (!outputDiv) return; // safety: nothing to show
     outputDiv.innerHTML = ''; // Clear previous output
 
-        fetch(`/flamapy/check_uvl/${file_id}`)
+    fetch(`/flamapy/check_csv/${file_id}`)
             .then(response => {
                 return response.json().then(data => ({
                     status: response.status,
@@ -522,28 +491,28 @@
                 if (status === 400) {
                     // Display errors
                     if (data.errors) {
-                        outputDiv.innerHTML = '<span class="badge badge-danger">Errors:</span>';
+                        outputDiv.innerHTML = '<span class="badge bg-danger">Errors:</span>';
                         data.errors.forEach(error => {
                             const errorElement = document.createElement('span');
-                            errorElement.className = 'badge badge-danger';
+                            errorElement.className = 'badge bg-danger me-1';
                             errorElement.textContent = error;
                             outputDiv.appendChild(errorElement);
                             outputDiv.appendChild(document.createElement('br')); // Line break for better readability
                         });
                     } else {
-                        outputDiv.innerHTML = `<span class="badge badge-danger">Error: ${data.error}</span>`;
+                        outputDiv.innerHTML = `<span class="badge bg-danger">Error: ${data.error}</span>`;
                     }
                 } else if (status === 200) {
                     // Display success message
-                    outputDiv.innerHTML = '<span class="badge badge-success">Valid Model</span>';
+                    outputDiv.innerHTML = '<span class="badge bg-success">Valid Model</span>';
                 } else {
                     // Handle unexpected status
-                    outputDiv.innerHTML = `<span class="badge badge-warning">Unexpected response status: ${status}</span>`;
+                    outputDiv.innerHTML = `<span class="badge bg-warning">Unexpected response status: ${status}</span>`;
                 }
             })
             .catch(error => {
                 // Handle fetch errors
-                outputDiv.innerHTML = `<span class="badge badge-danger">An unexpected error occurred: ${error.message}</span>`;
+                outputDiv.innerHTML = `<span class="badge bg-danger">An unexpected error occurred: ${error.message}</span>`;
             });
     }
 
