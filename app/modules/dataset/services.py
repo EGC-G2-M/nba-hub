@@ -1,3 +1,4 @@
+import csv
 import hashlib
 import logging
 import os
@@ -34,6 +35,42 @@ def calculate_checksum_and_size(file_path):
         content = file.read()
         hash_md5 = hashlib.md5(content).hexdigest()
         return hash_md5, file_size
+
+
+def extract_csv_columns(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            headers = next(reader)
+            return [h.strip() for h in headers]
+    except Exception as e:
+        logger.error(f"Error extracting columns from {file_path}: {e}")
+        return []
+
+
+def get_non_common_columns(columns):
+    common_columns_lower = {
+        'name', 'height', 'age', 'games', 
+        'points per game', 'assists per game', 'rebounds per game'
+    }
+    return [col for col in columns if col.lower() not in common_columns_lower]
+
+
+def aggregate_dataset_columns(temp_folder, feature_models_data):
+    all_specific_columns = set()
+    
+    for feature_model in feature_models_data:
+        csv_filename = feature_model.csv_filename.data
+        file_path = os.path.join(temp_folder, csv_filename)
+        
+        if os.path.exists(file_path):
+            all_columns = extract_csv_columns(file_path)
+            specific_columns = get_non_common_columns(all_columns)
+            all_specific_columns.update(specific_columns)
+    
+    if all_specific_columns:
+        return ', '.join(sorted(all_specific_columns))
+    return None
 
 
 class DataSetService(BaseService):
@@ -109,7 +146,13 @@ class DataSetService(BaseService):
         }
         try:
             logger.info(f"Creating dsmetadata...: {form.get_dsmetadata()}")
-            dsmetadata = self.dsmetadata_repository.create(**form.get_dsmetadata())
+
+            temp_folder = current_user.temp_folder()
+            extra_fields = aggregate_dataset_columns(temp_folder, form.feature_models)
+            dsmetadata_dict = form.get_dsmetadata()
+            dsmetadata_dict['extra_fields'] = extra_fields
+
+            dsmetadata = self.dsmetadata_repository.create(**dsmetadata_dict)
             for author_data in [main_author] + form.get_authors():
                 author = self.author_repository.create(commit=False, ds_meta_data_id=dsmetadata.id, **author_data)
                 dsmetadata.authors.append(author)
@@ -151,7 +194,7 @@ class DataSetService(BaseService):
     
     def get_top5_trending_datasets_last_30_days(self):
         return self.repository.get_top5_trending_datasets_last_30_days()
-    
+
 
 class AuthorService(BaseService):
     def __init__(self):
