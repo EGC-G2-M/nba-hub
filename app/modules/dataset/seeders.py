@@ -97,6 +97,7 @@ class DataSetSeeder(BaseSeeder):
                 dataset_doi="10.1234/west-regular-season-champs",
                 tags="nba, west, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
+                extra_fields="Blocks per game"
             ),
             DSMetaData(
                 deposition_id=8,
@@ -157,6 +158,7 @@ class DataSetSeeder(BaseSeeder):
                 dataset_doi="10.1234/spurs-ring-winners",
                 tags="nba, spurs, rings",
                 ds_metrics_id=seeded_ds_metrics.id,
+                extra_fields="Blocks per game, Steals per game",
             )
         ]
         seeded_ds_meta_data = self.seed(nba_datasets)
