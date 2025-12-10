@@ -6,90 +6,108 @@
 
 <div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 fw-bold mb-0">
-            Comments <span class="text-muted fs-6 fw-normal">({{ comments|length }})</span>
-        </h1>
-        <button type="button" class="btn btn-primary btn-sm d-flex align-items-center gap-2" data-bs-toggle="modal"
-            data-bs-target="#createCommentModal">
-            <i data-feather="plus-circle" style="width: 18px; height: 18px;"></i>
-            New comment
-        </button>
+    <div class="row">
+        <div class="col-12 col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 fw-bold mb-0">
+                    Comments <span class="text-muted fs-6 fw-normal">({{ comments|length }})</span>
+                </h1>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#createCommentModal" data-parent-id="">
+                    New comment
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-12 col-lg-10">
 
             {% if comments %}
-            {% for comment in comments %}
-            <div class="alert alert-warning">
-                <strong>DEBUG:</strong><br>
-                Comment ID: {{ comment.id }}<br>
-                User ID (numero): {{ comment.user_id }}<br>
-                Objeto User: {{ comment.user }}<br>
-                Objeto Profile: {{ comment.user.profile }}
-            </div>
 
-            {% set user_name = "Usuario Anónimo" %}
-            {% set user_avatar_seed = comment.user_id %}
+            {% for comment in comments %}
+            {% if not comment.parent_id %}
 
             {% set user_name = "Anónimo" %}
-
             {% if comment.user and comment.user.profile %}
             {% set user_name = comment.user.profile.name ~ " " ~ comment.user.profile.surname %}
-
+            {% elif comment.user and comment.user.email %}
+            {% set user_name = comment.user.email.split('@')[0] %}
             {% else %}
             {% set user_name = "User " ~ comment.user_id %}
             {% endif %}
-
             {% set user_avatar_seed = user_name %}
 
-            <div class="d-flex align-items-start mb-4">
+            <div class="comment-card">
 
-                <div class="flex-shrink-0">
-                    <img src="https://ui-avatars.com/api/?name={{ user_avatar_seed }}&background=random&size=128"
-                        class="rounded-circle" alt="Avatar" width="40" height="40">
-                </div>
-
-                <div class="ms-3 w-100">
-                    <div class="d-flex align-items-baseline mb-1">
-                        <h6 class="fw-bold mb-0 me-2" style="font-size: 0.95rem;">
-                            {{ user_name }}
-                        </h6>
-                        <small class="text-muted" style="font-size: 0.75rem;">
-                            {{ comment.created_at }}
-                        </small>
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0">
+                        <img src="https://ui-avatars.com/api/?name={{ user_avatar_seed }}&background=random&size=128"
+                            class="rounded-circle" width="40" height="40" alt="Avatar">
                     </div>
+                    <div class="ms-3 w-100">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-dark">{{ user_name }}</span>
+                            <small class="text-muted">{{ comment.created_at }}</small>
+                        </div>
 
-                    <p class="mb-2 text-break" style="font-size: 0.95rem; line-height: 1.4;">
-                        {{ comment.content }}
-                    </p>
+                        <p class="mb-2 text-break">{{ comment.content }}</p>
 
-                    <div class="d-flex align-items-center gap-3">
-                        <a href="#" class="text-decoration-none text-secondary d-flex align-items-center gap-1">
-                            <i data-feather="thumbs-up" style="width: 16px; height: 16px;"></i>
-                        </a>
-                        <a href="#" class="text-decoration-none text-secondary">
-                            <i data-feather="thumbs-down" style="width: 16px; height: 16px;"></i>
-                        </a>
-                        <a href="#" class="text-decoration-none text-secondary fw-bold" style="font-size: 0.8rem;">
-                            Responder
-                        </a>
+                        <div class="d-flex align-items-center gap-3 mb-1">
+                            <a href="#" class="text-secondary"><i data-feather="thumbs-up" style="width: 16px;"></i></a>
+                            <a href="#" class="text-secondary"><i data-feather="thumbs-down"
+                                    style="width: 16px;"></i></a>
+                            <button class="btn btn-sm btn-link text-decoration-none fw-bold p-0" data-bs-toggle="modal"
+                                data-bs-target="#createCommentModal"
+                                data-parent-id="{{ comment.id }}">Responder</button>
+                        </div>
                     </div>
                 </div>
+
+                {% if comment.replies.count() > 0 %}
+                <div class="replies-wrapper mt-3 ps-3" style="border-left: none;">
+                    {% for reply in comment.replies %}
+
+                    {% set reply_name = "Anónimo" %}
+                    {% if reply.user and reply.user.profile %}
+                    {% set reply_name = reply.user.profile.name ~ " " ~ reply.user.profile.surname %}
+                    {% elif reply.user and reply.user.email %}
+                    {% set reply_name = reply.user.email.split('@')[0] %}
+                    {% else %}
+                    {% set reply_name = "User " ~ reply.user_id %}
+                    {% endif %}
+
+                    <div class="reply-card border-0 border-start border-4 border-primary"
+                        style="background-color: #e4e9ee; border-radius: 4px; padding: 10px;">
+                        <div class="d-flex align-items-start">
+                            <div class="flex-shrink-0">
+                                <img src="https://ui-avatars.com/api/?name={{ reply_name }}&background=random&size=128"
+                                    class="rounded-circle" width="30" height="30" alt="Avatar">
+                            </div>
+                            <div class="ms-2 w-100">
+
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold text-dark" style="font-size: 0.9rem;">{{ reply_name }}</span>
+                                    <small class="text-muted" style="font-size: 0.75rem;">{{ reply.created_at }}</small>
+                                </div>
+
+                                <p class="mb-1 text-break" style="font-size: 0.9rem;">{{ reply.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </div>
+                {% endif %}
+
             </div>
+
+            {% endif %}
             {% endfor %}
 
             {% else %}
             <div class="text-center py-5 bg-light rounded-3">
-                <div class="mb-3">
-                    <i data-feather="message-circle" class="text-muted" style="width: 48px; height: 48px;"></i>
-                </div>
                 <h5 class="text-muted fw-bold">No comments yet</h5>
-                <button type="button" class="btn btn-outline-primary mt-2" data-bs-toggle="modal"
-                    data-bs-target="#createCommentModal">
-                    Write a comment
-                </button>
             </div>
             {% endif %}
 
@@ -104,6 +122,32 @@
         if (typeof feather !== 'undefined') {
             feather.replace();
         }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var commentModal = document.getElementById('createCommentModal');
+
+        commentModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+
+            var parentId = button.getAttribute('data-parent-id');
+
+            var modalTitle = commentModal.querySelector('#modalTitle');
+            var parentIdInput = commentModal.querySelector('#parent_id');
+            var contentInput = commentModal.querySelector('#commentContent');
+
+            if (parentId) {
+                modalTitle.textContent = "Reply to comment";
+                parentIdInput.value = parentId;
+            } else {
+                modalTitle.textContent = "Write your comment!";
+                parentIdInput.value = "";
+            }
+
+            contentInput.value = "";
+        });
     });
 </script>
 
