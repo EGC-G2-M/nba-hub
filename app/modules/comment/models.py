@@ -30,6 +30,8 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=True)
 
+    user = db.relationship('User', backref='comments')
+
     replies = db.relationship(
         'Comment', 
         backref=db.backref('parent', remote_side=[id]), 

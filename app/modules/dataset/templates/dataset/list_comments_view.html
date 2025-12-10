@@ -4,65 +4,107 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="container-fluid py-4">
 
-    <h1 class="h3 mb-0">Comments</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 fw-bold mb-0">
+            Comments <span class="text-muted fs-6 fw-normal">({{ comments|length }})</span>
+        </h1>
+        <button type="button" class="btn btn-primary btn-sm d-flex align-items-center gap-2" data-bs-toggle="modal"
+            data-bs-target="#createCommentModal">
+            <i data-feather="plus-circle" style="width: 18px; height: 18px;"></i>
+            New comment
+        </button>
+    </div>
 
-    {% if comments %}
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCommentModal">
-        <i data-feather="edit" class="center-button-icon"></i>
-        New comment
-    </button>
-    {% endif %}
+    <div class="row">
+        <div class="col-12 col-lg-10">
 
-</div>
+            {% if comments %}
+            {% for comment in comments %}
+            <div class="alert alert-warning">
+                <strong>DEBUG:</strong><br>
+                Comment ID: {{ comment.id }}<br>
+                User ID (numero): {{ comment.user_id }}<br>
+                Objeto User: {{ comment.user }}<br>
+                Objeto Profile: {{ comment.user.profile }}
+            </div>
 
-{% if comments %}
-<div class=" col-12">
-    {% for comment in comments %}
-    <div class="card">
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>User_id</th>
-                        <th>Content</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
+            {% set user_name = "Usuario Anónimo" %}
+            {% set user_avatar_seed = comment.user_id %}
 
-                    <tr>
-                        <td>{{ comment.user_id }}</td>
-                        <td>{{ comment.content }}</td>
-                        <td>{{ comment.created_at }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            {% set user_name = "Anónimo" %}
+
+            {% if comment.user and comment.user.profile %}
+            {% set user_name = comment.user.profile.name ~ " " ~ comment.user.profile.surname %}
+
+            {% else %}
+            {% set user_name = "User " ~ comment.user_id %}
+            {% endif %}
+
+            {% set user_avatar_seed = user_name %}
+
+            <div class="d-flex align-items-start mb-4">
+
+                <div class="flex-shrink-0">
+                    <img src="https://ui-avatars.com/api/?name={{ user_avatar_seed }}&background=random&size=128"
+                        class="rounded-circle" alt="Avatar" width="40" height="40">
+                </div>
+
+                <div class="ms-3 w-100">
+                    <div class="d-flex align-items-baseline mb-1">
+                        <h6 class="fw-bold mb-0 me-2" style="font-size: 0.95rem;">
+                            {{ user_name }}
+                        </h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            {{ comment.created_at }}
+                        </small>
+                    </div>
+
+                    <p class="mb-2 text-break" style="font-size: 0.95rem; line-height: 1.4;">
+                        {{ comment.content }}
+                    </p>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="#" class="text-decoration-none text-secondary d-flex align-items-center gap-1">
+                            <i data-feather="thumbs-up" style="width: 16px; height: 16px;"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none text-secondary">
+                            <i data-feather="thumbs-down" style="width: 16px; height: 16px;"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none text-secondary fw-bold" style="font-size: 0.8rem;">
+                            Responder
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+            <div class="text-center py-5 bg-light rounded-3">
+                <div class="mb-3">
+                    <i data-feather="message-circle" class="text-muted" style="width: 48px; height: 48px;"></i>
+                </div>
+                <h5 class="text-muted fw-bold">No comments yet</h5>
+                <button type="button" class="btn btn-outline-primary mt-2" data-bs-toggle="modal"
+                    data-bs-target="#createCommentModal">
+                    Write a comment
+                </button>
+            </div>
+            {% endif %}
+
         </div>
     </div>
-    {% endfor %}
 </div>
-{% else %}
-<div class="col-12 col-md-6">
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title mb-0">No comments found</h5>
-        </div>
-        <div class="card-body">
-            <p class="card-text">
-                This dataset has no comments yet. Do you want to be the first to comment?
-            </p>
-            <button type="button" class="btn btn-primary flex-fill" style="border-radius: 5px;" data-bs-toggle="modal"
-                data-bs-target="#createCommentModal">
-                <i data-feather="edit" class="center-button-icon"></i>
-                New comment
-            </button>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 {% include "create_comment_modal.html" %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
+</script>
 
 {% endblock %}
