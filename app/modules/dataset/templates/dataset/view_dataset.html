@@ -252,7 +252,8 @@
                 <div class="row">
                     <div class="col-12 d-flex justify-content-between align-items-center">
                         <h4 style="margin-bottom: 0px">CSV models</h4>
-                        <h4 style="margin-bottom: 0px;"><span class="badge bg-dark">{{ dataset.get_files_count() }}</span></h4>
+                        <h4 style="margin-bottom: 0px;"><span class="badge bg-dark">{{ dataset.get_files_count()
+                                }}</span></h4>
                     </div>
                 </div>
 
@@ -274,6 +275,10 @@
                                 <small class="text-muted">({{ file.get_formatted_size() }})</small>
                                 
                             </div>
+                            <div class="col-12 text-end">
+
+                                <button onclick="viewFile('{{ file.id }}')" class="btn btn-outline-secondary btn-sm"
+                                    style="border-radius: 5px;">
                             <div class="col-12 text-end" >
                                 <div id="check_{{ file.id }}" class="mt-2 p-1"></div>
                                 <button onclick="viewFile('{{ file.id }}')" class="btn btn-outline-secondary btn-sm" style="border-radius: 5px;">
@@ -281,12 +286,15 @@
                                 </button>
 
                                 <div class="btn-group" role="group">
-                                    <button id="btnGroupDrop{{ file.id }}" type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style=" border-radius: 5px;">
+                                    <button id="btnGroupDrop{{ file.id }}" type="button"
+                                        class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style=" border-radius: 5px;">
                                         <i data-feather="check"></i> Check
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="btnGroupDrop{{ file.id }}">
                                         <li>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.check_csv', file_id=file.id) }}" onclick="checkCSV('{{ file.id }}'); return false;">Syntax check</a>
+                                            <a class="dropdown-item" href="javascript:void(0);"
+                                                onclick="checkCSV('{{ file.id }}')">Syntax check</a>
                                         </li>
                                         <!--
                                         <li>
@@ -296,16 +304,53 @@
                                     </ul>
                                 </div>
                                 <div class="btn-group" role="group">
-                                    <button id="btnGroupDropExport{{ file.id }}" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style=" border-radius: 5px;">
+                                    <button id="btnGroupDropExport{{ file.id }}" type="button"
+                                        class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style=" border-radius: 5px;">
                                         <i data-feather="download"></i> Export
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="btnGroupDropExport{{ file.id }}">
                                         <li>
-                                            <a class="dropdown-item" href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
+                                            <a class="dropdown-item"
+                                                href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
                                                 CSV
                                                 <script>
                                                     function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        fetch('/file/download/' + datasetId).catch(() => { });
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
+                                            </a>
+                                            <a class="dropdown-item"
+                                                href="{{ url_for('flamapy.to_glencoe', file_id=file.id) }}">
+                                                Glencoe
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(() => { });
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                                href="{{ url_for('flamapy.to_cnf', file_id=file.id) }}">
+                                                DIMACS
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(() => { });
+                                                        window.open(targetUrl, '_blank');
+                                                    }
+                                                </script>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                                href="{{ url_for('flamapy.to_splot', file_id=file.id) }}">
+                                                SPLOT
+                                                <script>
+                                                    function recordCounterFile(datasetId, targetUrl) {
+                                                        fetch('/file/download/' + datasetId).catch(() => { });
                                                         window.open(targetUrl, '_blank');
                                                     }
                                                 </script>
@@ -371,10 +416,9 @@
             <div class="mb-3">
 
                 {% if current_user.is_authenticated %}
-                <div class="d-flex gap-2", style="margin-top: 15px;">
-                    <button type="button" class="btn btn-primary flex-fill" style="border-radius: 5px;"
-                        data-bs-toggle="modal" data-bs-target="#createCommentModal">
-                        <i data-feather="edit" class="center-button-icon"></i>
+                <div class="d-flex gap-2" , style="margin-top: 15px;">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#createCommentModal" data-parent-id="">
                         New comment
                     </button>
                     <a href="/datasets/{{dataset.id}}/comments" class="btn btn-primary flex-fill"
@@ -382,7 +426,7 @@
                         <i data-feather="eye" class="center-button-icon"></i>
                         {% if parent_comments_count > 0%}
                         View all comments
-                        {% else %}  
+                        {% else %}
                         Go to comments section
                         {% endif %}
                     </a>
@@ -400,7 +444,7 @@
                     </a>
                 </div>
 
-                
+
 
                 {% endif %}
 
