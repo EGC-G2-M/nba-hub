@@ -63,5 +63,8 @@ else
     flask db upgrade
 fi
 
+# Force seeding of comments
+python -c "from app import create_app; from app.modules.comment.seeders import CommentSeeder; app=create_app(); ctx=app.app_context(); ctx.push(); CommentSeeder().run(); print('Comentarios forzados y guardados con éxito')"
+
 # Start the Flask application with specified host and port, enabling reload and debug mode
 exec flask run --host=0.0.0.0 --port=5000 --reload --debug
