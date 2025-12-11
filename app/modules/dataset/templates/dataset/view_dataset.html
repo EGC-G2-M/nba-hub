@@ -296,11 +296,11 @@
                                             <a class="dropdown-item" href="javascript:void(0);"
                                                 onclick="checkCSV('{{ file.id }}')">Syntax check</a>
                                         </li>
-                                        <!--
-                                        <li>
+                                        
+                                        <!-- <li>
                                             <a class="dropdown-item" href="{{ url_for('flamapy.valid', file_id=file.id) }}">SAT validity check</a>
-                                        </li>
-                                        -->
+                                        </li> -->
+                                       
                                     </ul>
                                 </div>
                                 <div class="btn-group" role="group">
@@ -321,41 +321,6 @@
                                                     }
                                                 </script>
                                             </a>
-                                            <a class="dropdown-item"
-                                                href="{{ url_for('flamapy.to_glencoe', file_id=file.id) }}">
-                                                Glencoe
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(() => { });
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                                href="{{ url_for('flamapy.to_cnf', file_id=file.id) }}">
-                                                DIMACS
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(() => { });
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                                href="{{ url_for('flamapy.to_splot', file_id=file.id) }}">
-                                                SPLOT
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(() => { });
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
                             </div>
