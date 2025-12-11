@@ -293,7 +293,7 @@ class DataSetSeeder(BaseSeeder):
                         csv_filename=csv_filename,
                         title=csv_filename.replace(".csv", "").replace("_", " ").title(),
                         description=f"Data file {csv_filename} belonging to {folder_name}",
-                        publication_type=PublicationType.SOFTWARE_DOCUMENTATION,
+                        publication_type=PublicationType.PLAYER,
                         publication_doi=f"10.1234/{csv_filename}",
                         tags="nba, csv, team-data",
                         uvl_version=None
