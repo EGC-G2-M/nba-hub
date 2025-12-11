@@ -30,7 +30,6 @@ class DataSetSeeder(BaseSeeder):
         nba_datasets = [
             DSMetaData(
                 deposition_id=1,
-                deposition_id=1,
                 title="East Regular Season Champs",
                 description="Dataset about east-regular-season-champs",
                 publication_type=PublicationType.SEASON,
