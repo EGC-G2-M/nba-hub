@@ -1,14 +1,8 @@
 import logging
-import os
-import tempfile
+import csv
+import re
 
-from antlr4 import CommonTokenStream, FileStream
-from antlr4.error.ErrorListener import ErrorListener
-from flamapy.metamodels.fm_metamodel.transformations import GlencoeWriter, SPLOTWriter, UVLReader
-from flamapy.metamodels.pysat_metamodel.transformations import DimacsWriter, FmToPysat
-from flask import jsonify, send_file
-from uvl.UVLCustomLexer import UVLCustomLexer
-from uvl.UVLPythonParser import UVLPythonParser
+from flask import jsonify
 
 from app.modules.flamapy import flamapy_bp
 from app.modules.hubfile.services import HubfileService
@@ -16,101 +10,92 @@ from app.modules.hubfile.services import HubfileService
 logger = logging.getLogger(__name__)
 
 
-@flamapy_bp.route("/flamapy/check_uvl/<int:file_id>", methods=["GET"])
-def check_uvl(file_id):
-    class CustomErrorListener(ErrorListener):
-        def __init__(self):
-            self.errors = []
-
-        def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-            if "\\t" in msg:
-                warning_message = (
-                    f"The UVL has the following warning that prevents reading it: " f"Line {line}:{column} - {msg}"
-                )
-                print(warning_message)
-                self.errors.append(warning_message)
-            else:
-                error_message = (
-                    f"The UVL has the following error that prevents reading it: " f"Line {line}:{column} - {msg}"
-                )
-                self.errors.append(error_message)
-
+@flamapy_bp.route("/flamapy/check_csv/<int:file_id>", methods=["GET"])
+def check_csv(file_id):
+    expected_header = [
+        "Name",
+        "Height",
+        "Age",
+        "Games",
+        "Points per game",
+        "Assists per game",
+        "Rebounds per game",
+    ]
+    errors = []
     try:
         hubfile = HubfileService().get_by_id(file_id)
-        input_stream = FileStream(hubfile.get_path())
-        lexer = UVLCustomLexer(input_stream)
+        path = hubfile.get_path()
+        height_re = re.compile(r"^\d+m\d{2}$")
+        with open(path, newline="", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            try:
+                header = next(reader)
+            except StopIteration:
+                return jsonify({"errors": ["Empty file"]}), 400
+            header = [h.strip() for h in header]
+            if len(header) < len(expected_header) or header[: len(expected_header)] != expected_header:
+                errors.append(
+                    f"Header mismatch. Expected: {', '.join(expected_header)}. Found: {', '.join(header)}"
+                )
+            line_no = 1 
+            for row in reader:
+                line_no += 1
+                if not any(cell.strip() for cell in row):
+                    continue
+                if len(row) < len(expected_header):
+                    errors.append(
+                        f"Line {line_no}: expected {len(expected_header)} columns, found {len(row)}"
+                    )
+                    continue
 
-        error_listener = CustomErrorListener()
+                name = row[0].strip()
+                height = row[1].strip()
+                age = row[2].strip()
+                games = row[3].strip()
+                points = row[4].strip()
+                assists = row[5].strip()
+                rebounds = row[6].strip()
 
-        lexer.removeErrorListeners()
-        lexer.addErrorListener(error_listener)
+                if not name:
+                    errors.append(f"Line {line_no}: Name is empty")
 
-        stream = CommonTokenStream(lexer)
-        parser = UVLPythonParser(stream)
+                if not height_re.match(height):
+                    errors.append(
+                        f"Line {line_no}: Height '{height}' does not match pattern e.g. '1m95'"
+                    )
+                for field_name, value in (("Age", age), ("Games", games)):
+                    if field_name == "Age" and value == "":
+                        continue
+                    try:
+                        int(value)
+                    except Exception:
+                        errors.append(
+                            f"Line {line_no}: {field_name} '{value}' is not a valid integer"
+                        )
 
-        parser.removeErrorListeners()
-        parser.addErrorListener(error_listener)
+                # Float fields
+                for field_name, value in (
+                    ("Points per game", points),
+                    ("Assists per game", assists),
+                    ("Rebounds per game", rebounds),
+                ):
+                    try:
+                        float(value)
+                    except Exception:
+                        errors.append(
+                            f"Line {line_no}: {field_name} '{value}' is not a valid number"
+                        )
 
-        # tree = parser.featureModel()
+        if errors:
+            return jsonify({"errors": errors}), 400
 
-        if error_listener.errors:
-            return jsonify({"errors": error_listener.errors}), 400
-
-        # Optional: Print the parse tree
-        # print(tree.toStringTree(recog=parser))
-
-        return jsonify({"message": "Valid Model"}), 200
+        return jsonify({"message": "Valid CSV file"}), 200
 
     except Exception as e:
+        logger.exception("Error comprobando CSV")
         return jsonify({"error": str(e)}), 500
 
 
 @flamapy_bp.route("/flamapy/valid/<int:file_id>", methods=["GET"])
 def valid(file_id):
     return jsonify({"success": True, "file_id": file_id})
-
-
-@flamapy_bp.route("/flamapy/to_glencoe/<int:file_id>", methods=["GET"])
-def to_glencoe(file_id):
-    temp_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
-    try:
-        hubfile = HubfileService().get_or_404(file_id)
-        fm = UVLReader(hubfile.get_path()).transform()
-        GlencoeWriter(temp_file.name, fm).transform()
-
-        # Return the file in the response
-        return send_file(temp_file.name, as_attachment=True, download_name=f"{hubfile.name}_glencoe.txt")
-    finally:
-        # Clean up the temporary file
-        os.remove(temp_file.name)
-
-
-@flamapy_bp.route("/flamapy/to_splot/<int:file_id>", methods=["GET"])
-def to_splot(file_id):
-    temp_file = tempfile.NamedTemporaryFile(suffix=".splx", delete=False)
-    try:
-        hubfile = HubfileService().get_by_id(file_id)
-        fm = UVLReader(hubfile.get_path()).transform()
-        SPLOTWriter(temp_file.name, fm).transform()
-
-        # Return the file in the response
-        return send_file(temp_file.name, as_attachment=True, download_name=f"{hubfile.name}_splot.txt")
-    finally:
-        # Clean up the temporary file
-        os.remove(temp_file.name)
-
-
-@flamapy_bp.route("/flamapy/to_cnf/<int:file_id>", methods=["GET"])
-def to_cnf(file_id):
-    temp_file = tempfile.NamedTemporaryFile(suffix=".cnf", delete=False)
-    try:
-        hubfile = HubfileService().get_by_id(file_id)
-        fm = UVLReader(hubfile.get_path()).transform()
-        sat = FmToPysat(fm).transform()
-        DimacsWriter(temp_file.name, sat).transform()
-
-        # Return the file in the response
-        return send_file(temp_file.name, as_attachment=True, download_name=f"{hubfile.name}_cnf.txt")
-    finally:
-        # Clean up the temporary file
-        os.remove(temp_file.name)
