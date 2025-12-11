@@ -39,27 +39,159 @@
             {% set user_avatar_seed = user_name %}
 
             <div class="comment-card">
-
-                <div class="d-flex align-items-start">
+                <div class="d-flex align-items-start mb-2">
                     <div class="flex-shrink-0">
                         <img src="https://ui-avatars.com/api/?name={{ user_avatar_seed }}&background=random&size=128"
                             class="rounded-circle" width="40" height="40" alt="Avatar">
                     </div>
+
                     <div class="ms-3 w-100">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="fw-bold text-dark">{{ user_name }}</span>
-                            <small class="text-muted">{{ comment.created_at }}</small>
+
+                            <div class="d-flex align-items-center flex-wrap">
+                                <span class="fw-bold text-dark me-2">{{ user_name }}</span>
+                                <small class="text-muted" style="font-size: 0.8rem;">{{ comment.created_at }}</small>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+
+                                {% if dataset.user_id == current_user.id %}
+                                <form action="{{ url_for('comment.toggle_pin', comment_id=comment.id) }}" method="POST"
+                                    class="d-inline">
+                                    <input type="hidden" name="pin_action"
+                                        value="{{ 'unpin' if comment.is_pinned else 'pin' }}">
+                                    <button type="submit" class="btn btn-sm btn-link p-0 text-secondary"
+                                        title="{{ 'Desfijar' if comment.is_pinned else 'Fijar' }}">
+
+                                        {% if comment.is_pinned %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="orange" stroke="orange" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                                            <path
+                                                d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z">
+                                            </path>
+                                        </svg>
+                                        {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                                            <path
+                                                d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z">
+                                            </path>
+                                        </svg>
+                                        {% endif %}
+                                    </button>
+                                </form>
+
+                                {% elif comment.is_pinned %}
+                                <span title="Fijado por el autor" style="cursor: default;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                        fill="orange" stroke="orange" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <line x1="12" y1="17" x2="12" y2="22"></line>
+                                        <path
+                                            d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z">
+                                        </path>
+                                    </svg>
+                                </span>
+                                {% endif %}
+
+
+                                {% if current_user.is_authenticated %}
+                                {% if current_user.id == comment.user_id or current_user.id == dataset.user_id %}
+                                <form action="{{ url_for('comment.delete_comment_route', comment_id=comment.id) }}"
+                                    method="POST" class="d-inline"
+                                    onsubmit="return confirm('¿Borrar este comentario?');">
+                                    <button type="submit" class="btn btn-sm btn-link p-0 text-danger ms-1"
+                                        title="Borrar">
+                                        <i data-feather="trash-2"
+                                            style="width: 20px; height: 20px; stroke-width: 2;"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% endif %}
+                            </div>
                         </div>
 
-                        <p class="mb-2 text-break">{{ comment.content }}</p>
+                        <p class="mb-2 text-break" style="font-size: 0.95rem; color: #333;">
+                            {{ comment.content }}
+                        </p>
 
-                        <div class="d-flex align-items-center gap-3 mb-1">
-                            <a href="#" class="text-secondary"><i data-feather="thumbs-up" style="width: 16px;"></i></a>
-                            <a href="#" class="text-secondary"><i data-feather="thumbs-down"
-                                    style="width: 16px;"></i></a>
-                            <button class="btn btn-sm btn-link text-decoration-none fw-bold p-0" data-bs-toggle="modal"
-                                data-bs-target="#createCommentModal"
-                                data-parent-id="{{ comment.id }}">Responder</button>
+                        {% set my_vote = comment | check_vote(current_user) %}
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <form action="{{ url_for('comment.toggle_vote', comment_id=comment.id) }}" method="POST"
+                                class="d-inline">
+                                <input type="hidden" name="vote_type" value="1">
+
+                                {% if my_vote == 1 %}
+                                <button type="submit"
+                                    class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                                    style="color: #019409 !important;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24"
+                                        fill="#019409" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                        </path>
+                                    </svg>
+                                    <small class="fw-bold">{{ comment.likes }}</small>
+                                </button>
+                                {% else %}
+                                <button type="submit"
+                                    class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1 text-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24"
+                                        fill="currentColor" stroke="#ffffff" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path
+                                            d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                        </path>
+                                    </svg>
+                                    <small>{{ comment.likes}}</small>
+                                </button>
+                                {% endif %}
+                            </form>
+
+
+                            <form action="{{ url_for('comment.toggle_vote', comment_id=comment.id) }}" method="POST"
+                                class="d-inline">
+                                <input type="hidden" name="vote_type" value="-1">
+
+                                {% if my_vote == -1 %}
+                                <button type="submit"
+                                    class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                                    style="color: #dc3545 !important;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24"
+                                        fill="#dc3545" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round"
+                                        style="transform: translateY(2px);">
+                                        <path
+                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                        </path>
+                                    </svg>
+                                    <small class="fw-bold">{{ comment.dislikes }}</small>
+                                </button>
+                                {% else %}
+                                <button type="submit"
+                                    class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1 text-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24"
+                                        fill="currentColor" stroke="#ffffff" stroke-linecap="round"
+                                        stroke-linejoin="round" style="transform: translateY(2px);">
+                                        <path
+                                            d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
+                                        </path>
+                                    </svg>
+                                    <small>{{ comment.dislikes }}</small>
+                                </button>
+                                {% endif %}
+                            </form>
+
+                            <button class="btn btn-sm btn-link text-decoration-none fw-bold p-0 ms-2"
+                                style="font-size: 0.9rem;" data-bs-toggle="modal" data-bs-target="#createCommentModal"
+                                data-parent-id="{{ comment.id }}">
+                                Responder
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -77,21 +209,43 @@
                     {% set reply_name = "User " ~ reply.user_id %}
                     {% endif %}
 
-                    <div class="reply-card border-0 border-start border-4 border-primary"
-                        style="background-color: #e4e9ee; border-radius: 4px; padding: 10px;">
+                    <div class="reply-card border-0 border-start border-4 border-primary mt-2"
+                        style="background-color: #ebf3fa; border-radius: 4px; padding: 10px;">
+
                         <div class="d-flex align-items-start">
                             <div class="flex-shrink-0">
                                 <img src="https://ui-avatars.com/api/?name={{ reply_name }}&background=random&size=128"
                                     class="rounded-circle" width="30" height="30" alt="Avatar">
                             </div>
-                            <div class="ms-2 w-100">
 
+                            <div class="ms-2 w-100">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="fw-bold text-dark" style="font-size: 0.9rem;">{{ reply_name }}</span>
-                                    <small class="text-muted" style="font-size: 0.75rem;">{{ reply.created_at }}</small>
+
+                                    <div class="d-flex align-items-center flex-wrap">
+                                        <span class="fw-bold text-dark me-2" style="font-size: 0.9rem;">{{ reply_name
+                                            }}</span>
+                                        <small class="text-muted" style="font-size: 0.75rem;">{{ reply.created_at
+                                            }}</small>
+                                    </div>
+
+                                    {% if current_user.is_authenticated %}
+                                    {% if current_user.id == reply.user_id or current_user.id == dataset.user_id %}
+                                    <form action="{{ url_for('comment.delete_comment_route', comment_id=reply.id) }}"
+                                        method="POST" class="d-inline"
+                                        onsubmit="return confirm('¿Borrar esta respuesta?');">
+                                        <button type="submit" class="btn btn-sm btn-link p-0 text-danger"
+                                            title="Borrar respuesta">
+                                            <i data-feather="trash-2"
+                                                style="width: 16px; height: 16px; stroke-width: 2;"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    {% endif %}
                                 </div>
 
-                                <p class="mb-1 text-break" style="font-size: 0.9rem;">{{ reply.content }}</p>
+                                <p class="mb-0 text-break" style="font-size: 0.9rem; color: #333;">
+                                    {{ reply.content }}
+                                </p>
                             </div>
                         </div>
                     </div>
