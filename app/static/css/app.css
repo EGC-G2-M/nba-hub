@@ -14853,4 +14853,17 @@ span.flatpickr-weekday {
     margin-bottom: 10px; 
 }
 
+/* Mensaje de aviso flotante */
+#flash-overlay-container {
+    position: fixed; 
+    top: 80px;       
+    right: 20px;     
+    width: 350px;   
+    z-index: 9999;   
+}
+
+#flash-overlay-container .alert {
+    border-left: 5px solid; 
+}
+
 /*# sourceMappingURL=app.css.map*/
