@@ -183,7 +183,9 @@ def test_repo_returns_empty_list_if_no_match(test_client):
     """
     Lógica Pura: Si no hay coincidencias, devuelve lista vacía [].
     """
-    user = User.query.first() or User(email="t@t.com", password="p").save()
+    user = User(email="tester@example.com", password="pass1234")
+    db.session.add(user)
+    db.session.commit()
     
     ds = create_dummy_dataset(user.id, "Unique One", "QuantumPhysics", ["Einstein"])
     
@@ -201,7 +203,9 @@ def test_repo_logic_ordering_and_limit(test_client):
     """
     Lógica Pura: Verifica que ordena por descargas y limita a 4 resultados.
     """
-    user = User.query.first()
+    user = User(email="tester1@example.com", password="pass1234")
+    db.session.add(user)
+    db.session.commit()
     
     main_ds = create_dummy_dataset(user.id, "Main", "CommonTag", ["Me"])
 
@@ -229,7 +233,9 @@ def test_repo_logic_excludes_self(test_client):
     """
     Lógica Pura: El dataset no debe recomendarse a sí mismo aunque coincidan tags.
     """
-    user = User.query.first()
+    user = User(email="tester2@example.com", password="pass1234")
+    db.session.add(user)
+    db.session.commit()
     ds = create_dummy_dataset(user.id, "Selfie", "Mirror", ["Narcissus"])
     
     repo = DataSetRepository()
