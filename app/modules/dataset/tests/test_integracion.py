@@ -2,7 +2,7 @@ import uuid
 import pytest
 from app import db
 from app.modules.auth.models import User
-from app.modules.dataset.models import DataSet, DSDownloadRecord, DSMetaData
+from app.modules.dataset.models import DataSet, DSDownloadRecord, DSMetaData, Author
 from app.modules.conftest import login, logout
 from datetime import datetime
 
@@ -52,6 +52,32 @@ def test_client(test_client):
             db.session.commit()
 
     return test_client
+
+def create_full_dataset(user_id, title, tags, author_names, doi_suffix):
+    """
+    Helper para crear un dataset completo en la DB de test.
+    """
+    meta = DSMetaData(
+        title=title,
+        description="Integration test description",
+        publication_type="NONE",
+        publication_doi="",
+        dataset_doi=f"10.1234/{doi_suffix}",
+        tags=tags
+    )
+    db.session.add(meta)
+    db.session.flush()
+
+    for name in author_names:
+        author = Author(name=name, ds_meta_data_id=meta.id)
+        db.session.add(author)
+
+    ds = DataSet(user_id=user_id, ds_meta_data_id=meta.id)
+    ds.created_at = datetime.now()
+    db.session.add(ds)
+    db.session.commit()
+    
+    return ds
 
 # ------------------------- Tests -------------------------
 
@@ -148,3 +174,57 @@ def test_no_trending_datasets(test_client, clean_database):
     response = test_client.get("/dataset/trending")
     assert response.status_code == 200
     assert b"No trending datasets found" in response.data
+
+def test_view_dataset_shows_related_datasets(test_client):
+    """
+    Crea 3 datasets (Main, Related, Unrelated) y verifica que en el HTML
+    del Main aparecen los relacionados y se excluyen los otros.
+    """
+
+    login(test_client, "user@example.com", "1234")
+    
+    user = User.query.filter_by(email="user@example.com").first()
+
+    main_ds = create_full_dataset(
+        user.id, "Main View Dataset", "AI, Tech", ["Author A"], "main-ds"
+    )
+    
+    related_ds = create_full_dataset(
+        user.id, "Related One", "AI, Robots", ["Author B"], "rel-ds"
+    )
+    
+    unrelated_ds = create_full_dataset(
+        user.id, "Unrelated Cooking", "Food", ["Chef C"], "unrel-ds"
+    )
+
+    url = f"/doi/{main_ds.ds_meta_data.dataset_doi}/"
+    resp = test_client.get(url)
+    
+    assert resp.status_code == 200
+    
+    html = resp.data.decode('utf-8')
+
+    assert "Related Datasets" in html
+    assert "Related One" in html
+    assert "Unrelated Cooking" not in html
+
+
+def test_view_dataset_no_related_message(test_client):
+    """
+    Verifica que si no hay coincidencias, muestra el mensaje 'No related datasets found'.
+    """
+    login(test_client, "user@example.com", "1234")
+    user = User.query.filter_by(email="user@example.com").first()
+
+    lonely_ds = create_full_dataset(
+        user.id, "Lonely Dataset", "Quantum-Unique", ["Dr. Solo"], "lonely-ds"
+    )
+
+    url = f"/doi/{lonely_ds.ds_meta_data.dataset_doi}/"
+    resp = test_client.get(url)
+    
+    assert resp.status_code == 200
+    html = resp.data.decode('utf-8')
+
+    assert "No related datasets found" in html
+    assert "card-title" not in html

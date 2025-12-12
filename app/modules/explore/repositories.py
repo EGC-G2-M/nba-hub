@@ -6,13 +6,14 @@ from sqlalchemy import any_, or_
 from app.modules.dataset.models import Author, DataSet, DSMetaData, PublicationType
 from app.modules.featuremodel.models import FeatureModel, FMMetaData
 from core.repositories.BaseRepository import BaseRepository
+from datetime import datetime
 
 
 class ExploreRepository(BaseRepository):
     def __init__(self):
         super().__init__(DataSet)
 
-    def filter(self, query="", sorting="newest", publication_type="any", tags=[], **kwargs):
+    def filter(self, query="", sorting="newest", publication_type="any", tags=[], start_date=None, end_date=None, **kwargs):
         # Normalize and remove unwanted characters
         normalized_query = unidecode.unidecode(query).lower()
         cleaned_query = re.sub(r'[,.":\'()\[\]^;!¡¿?]', "", normalized_query)
@@ -30,12 +31,13 @@ class ExploreRepository(BaseRepository):
             filters.append(FMMetaData.publication_doi.ilike(f"%{word}%"))
             filters.append(FMMetaData.tags.ilike(f"%{word}%"))
             filters.append(DSMetaData.tags.ilike(f"%{word}%"))
+            filters.append(DSMetaData.extra_fields.ilike(f"%{word}%"))
 
         datasets = (
             self.model.query.join(DataSet.ds_meta_data)
-            .join(DSMetaData.authors)
-            .join(DataSet.feature_models)
-            .join(FeatureModel.fm_meta_data)
+            .outerjoin(DSMetaData.authors)
+            .outerjoin(DataSet.feature_models)
+            .outerjoin(FeatureModel.fm_meta_data)
             .filter(or_(*filters))
             .filter(DSMetaData.dataset_doi.isnot(None))  # Exclude datasets with empty dataset_doi
         )
@@ -52,6 +54,17 @@ class ExploreRepository(BaseRepository):
 
         if tags:
             datasets = datasets.filter(DSMetaData.tags.ilike(any_(f"%{tag}%" for tag in tags)))
+
+        if start_date:
+            if isinstance(start_date, str):
+                start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+            datasets = datasets.filter(DataSet.created_at >= start_date)
+        
+        if end_date:
+            if isinstance(end_date, str):
+                end_date = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+            datasets = datasets.filter(DataSet.created_at <= end_date)
+
 
         # Order by created_at
         if sorting == "oldest":

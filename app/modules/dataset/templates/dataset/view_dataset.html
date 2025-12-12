@@ -26,7 +26,6 @@
             Explore more datasets
         </a>
     </div>
-
 </div>
 
 <div class="row">
@@ -201,41 +200,45 @@
 
             <div class="card-body">
 
-                <h3> Related publication </h3>
+                <h3>Related Datasets</h3>
+                <hr>
+                {% if related_datasets %}
+                <div class="row">
+                    {% for related in related_datasets %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">
+                                    <a href="{{ url_for('dataset.subdomain_index', doi=related.ds_meta_data.dataset_doi) }}" class="text-decoration-none text-dark">
+                                        {{ related.ds_meta_data.title }}
+                                    </a>
+                                </h5>
+                                
+                                <p class="card-text small text-muted mb-2">
+                                    <i data-feather="calendar"></i> {{ related.created_at.strftime('%Y-%m-%d') }} <br>
+                                    <i data-feather="download"></i> {{ related.download_count }} downloads
+                                </p>
 
-                David Romero-Organvidez, José A. Galindo, Chico Sundermann, Jose-Miguel Horcas, David Benavides,
-                <i>nbahub: A feature model data repository using UVL and open science principles</i>,
-                Journal of Systems and Software,
-                2024,
-                112150,
-                ISSN 0164-1212,
-                <a href="https://doi.org/10.1016/j.jss.2024.112150"
-                    target="_blank">https://doi.org/10.1016/j.jss.2024.112150</a>
-
+                                <div>
+                                    {% if related.ds_meta_data.tags %}
+                                        {% for tag in related.ds_meta_data.tags.split(',')[:2] %}
+                                            <span class="badge bg-light text-dark border">{{ tag }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <a href="{{ url_for('dataset.subdomain_index', doi=related.ds_meta_data.dataset_doi) }}" class="btn btn-primary btn-sm w-100">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
             </div>
-
-            <div class="card-body mt-0 pt-0">
-
-                <button onclick="copyText('bibtex_cite')" class="btn btn-light btn-sm"
-                    style="border-radius: 5px; margin-right: 10px">
-                    <i data-feather="clipboard" class="center-button-icon"></i>
-                    Copy in BibTex
-                </button>
-
-                <button onclick="copyText('ris_cite')" class="btn btn-light btn-sm" style="border-radius: 5px;">
-                    <i data-feather="clipboard" class="center-button-icon"></i>
-                    Copy in RIS
-                </button>
-
-                <button onclick="copyText('apa_cite')" class="btn btn-light btn-sm" style="border-radius: 5px;">
-                    <i data-feather="clipboard" class="center-button-icon"></i>
-                    Copy in APA
-                </button>
-
-                <button onclick="copyText('text_cite')" class="btn btn-light btn-sm" style="border-radius: 5px;">
-                    <i data-feather="clipboard" class="center-button-icon"></i>
-                    Copy in text
-                </button>
+            {% else %}
+            <p class="text-muted">No related datasets found.</p>
+            {% endif %}
 
             </div>
 
@@ -253,7 +256,8 @@
                 <div class="row">
                     <div class="col-12 d-flex justify-content-between align-items-center">
                         <h4 style="margin-bottom: 0px">CSV models</h4>
-                        <h4 style="margin-bottom: 0px;"><span class="badge bg-dark">{{ dataset.get_files_count() }}</span></h4>
+                        <h4 style="margin-bottom: 0px;"><span class="badge bg-dark">{{ dataset.get_files_count()
+                                }}</span></h4>
                     </div>
                 </div>
 
@@ -273,76 +277,54 @@
                                 <i data-feather="file"></i> {{ file.name }}
                                 <br>
                                 <small class="text-muted">({{ file.get_formatted_size() }})</small>
+                                
                             </div>
-                            <div class="col-12 text-end" >
+                            <div class="col-12 text-end">
 
+                                <button onclick="viewFile('{{ file.id }}')" class="btn btn-outline-secondary btn-sm"
+                                    style="border-radius: 5px;">
+                            <div class="col-12 text-end" >
+                                <div id="check_{{ file.id }}" class="mt-2 p-1"></div>
                                 <button onclick="viewFile('{{ file.id }}')" class="btn btn-outline-secondary btn-sm" style="border-radius: 5px;">
                                     <i data-feather="eye"></i> View
                                 </button>
 
                                 <div class="btn-group" role="group">
-                                    <button id="btnGroupDrop{{ file.id }}" type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style=" border-radius: 5px;">
+                                    <button id="btnGroupDrop{{ file.id }}" type="button"
+                                        class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style=" border-radius: 5px;">
                                         <i data-feather="check"></i> Check
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="btnGroupDrop{{ file.id }}">
                                         <li>
-                                            <a class="dropdown-item" href="javascript:void(0);" onclick="checkCSV('{{ file.id }}')">Syntax check</a>
+                                            <a class="dropdown-item" href="javascript:void(0);"
+                                                onclick="checkCSV('{{ file.id }}')">Syntax check</a>
                                         </li>
-                                        <!--
-                                        <li>
+                                        
+                                        <!-- <li>
                                             <a class="dropdown-item" href="{{ url_for('flamapy.valid', file_id=file.id) }}">SAT validity check</a>
-                                        </li>
-                                        -->
+                                        </li> -->
+                                       
                                     </ul>
                                 </div>
-                                
                                 <div class="btn-group" role="group">
-                                    <button id="btnGroupDropExport{{ file.id }}" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style=" border-radius: 5px;">
+                                    <button id="btnGroupDropExport{{ file.id }}" type="button"
+                                        class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false" style=" border-radius: 5px;">
                                         <i data-feather="download"></i> Export
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="btnGroupDropExport{{ file.id }}">
                                         <li>
-                                            <a class="dropdown-item" href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
+                                            <a class="dropdown-item"
+                                                href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
                                                 CSV
                                                 <script>
                                                     function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
+                                                        fetch('/file/download/' + datasetId).catch(() => { });
                                                         window.open(targetUrl, '_blank');
                                                     }
                                                 </script>
                                             </a>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_glencoe', file_id=file.id) }}">
-                                                Glencoe
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_cnf', file_id=file.id) }}">
-                                                DIMACS
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{{ url_for('flamapy.to_splot', file_id=file.id) }}">
-                                                SPLOT
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/download/' + datasetId).catch(()=>{});
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -403,10 +385,9 @@
             <div class="mb-3">
 
                 {% if current_user.is_authenticated %}
-                <div class="d-flex gap-2", style="margin-top: 15px;">
-                    <button type="button" class="btn btn-primary flex-fill" style="border-radius: 5px;"
-                        data-bs-toggle="modal" data-bs-target="#createCommentModal">
-                        <i data-feather="edit" class="center-button-icon"></i>
+                <div class="d-flex gap-2" , style="margin-top: 15px;">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#createCommentModal" data-parent-id="">
                         New comment
                     </button>
                     <a href="/datasets/{{dataset.id}}/comments" class="btn btn-primary flex-fill"
@@ -414,7 +395,7 @@
                         <i data-feather="eye" class="center-button-icon"></i>
                         {% if parent_comments_count > 0%}
                         View all comments
-                        {% else %}  
+                        {% else %}
                         Go to comments section
                         {% endif %}
                     </a>
@@ -432,7 +413,7 @@
                     </a>
                 </div>
 
-                
+
 
                 {% endif %}
 
@@ -509,9 +490,10 @@
     }
     function checkCSV(file_id) {
     const outputDiv = document.getElementById('check_' + file_id);
+    if (!outputDiv) return; // safety: nothing to show
     outputDiv.innerHTML = ''; // Clear previous output
 
-        fetch(`/flamapy/check_uvl/${file_id}`)
+    fetch(`/flamapy/check_csv/${file_id}`)
             .then(response => {
                 return response.json().then(data => ({
                     status: response.status,
@@ -522,28 +504,28 @@
                 if (status === 400) {
                     // Display errors
                     if (data.errors) {
-                        outputDiv.innerHTML = '<span class="badge badge-danger">Errors:</span>';
+                        outputDiv.innerHTML = '<span class="badge bg-danger">Errors:</span>';
                         data.errors.forEach(error => {
                             const errorElement = document.createElement('span');
-                            errorElement.className = 'badge badge-danger';
+                            errorElement.className = 'badge bg-danger me-1';
                             errorElement.textContent = error;
                             outputDiv.appendChild(errorElement);
                             outputDiv.appendChild(document.createElement('br')); // Line break for better readability
                         });
                     } else {
-                        outputDiv.innerHTML = `<span class="badge badge-danger">Error: ${data.error}</span>`;
+                        outputDiv.innerHTML = `<span class="badge bg-danger">Error: ${data.error}</span>`;
                     }
                 } else if (status === 200) {
                     // Display success message
-                    outputDiv.innerHTML = '<span class="badge badge-success">Valid Model</span>';
+                    outputDiv.innerHTML = '<span class="badge bg-success">Valid Model</span>';
                 } else {
                     // Handle unexpected status
-                    outputDiv.innerHTML = `<span class="badge badge-warning">Unexpected response status: ${status}</span>`;
+                    outputDiv.innerHTML = `<span class="badge bg-warning">Unexpected response status: ${status}</span>`;
                 }
             })
             .catch(error => {
                 // Handle fetch errors
-                outputDiv.innerHTML = `<span class="badge badge-danger">An unexpected error occurred: ${error.message}</span>`;
+                outputDiv.innerHTML = `<span class="badge bg-danger">An unexpected error occurred: ${error.message}</span>`;
             });
     }
 

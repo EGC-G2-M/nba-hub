@@ -9,23 +9,9 @@ from app import db
 
 class PublicationType(Enum):
     NONE = "none"
-    ANNOTATION_COLLECTION = "annotationcollection"
-    BOOK = "book"
-    BOOK_SECTION = "section"
-    CONFERENCE_PAPER = "conferencepaper"
-    DATA_MANAGEMENT_PLAN = "datamanagementplan"
-    JOURNAL_ARTICLE = "article"
-    PATENT = "patent"
-    PREPRINT = "preprint"
-    PROJECT_DELIVERABLE = "deliverable"
-    PROJECT_MILESTONE = "milestone"
-    PROPOSAL = "proposal"
-    REPORT = "report"
-    SOFTWARE_DOCUMENTATION = "softwaredocumentation"
-    TAXONOMIC_TREATMENT = "taxonomictreatment"
-    TECHNICAL_NOTE = "technicalnote"
-    THESIS = "thesis"
-    WORKING_PAPER = "workingpaper"
+    PLAYER = "player"
+    SEASON = "season"
+    PLAYOFFS = "playoffs"
     OTHER = "other"
 
 
@@ -59,9 +45,11 @@ class DSMetaData(db.Model):
     publication_doi = db.Column(db.String(120))
     dataset_doi = db.Column(db.String(120))
     tags = db.Column(db.String(120))
+    extra_fields = db.Column(db.String(120))
     ds_metrics_id = db.Column(db.Integer, db.ForeignKey("ds_metrics.id"))
     ds_metrics = db.relationship("DSMetrics", uselist=False, backref="ds_meta_data", cascade="all, delete")
     authors = db.relationship("Author", backref="ds_meta_data", lazy=True, cascade="all, delete")
+
 
 class DataSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -106,8 +94,10 @@ class DataSet(db.Model):
         from app.modules.dataset.services import DataSetService
 
         return DataSetService().get_nbahub_doi(self)
+
     def get_download_count(self) -> int:
         return self.download_count
+
     def to_dict(self):
         return {
             "title": self.ds_meta_data.title,

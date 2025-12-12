@@ -29,134 +29,136 @@ class DataSetSeeder(BaseSeeder):
 
         nba_datasets = [
             DSMetaData(
-                deposition_id=1, # Empezamos en 1
+                deposition_id=1,
                 title="East Regular Season Champs",
                 description="Dataset about east-regular-season-champs",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/east-regular-season-champs",
                 dataset_doi="10.1234/east-regular-season-champs",
-                tags="nba, east, champs",
+                tags="east, regular-season, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=2,
                 title="Marc Gasol Teams",
                 description="Dataset about Marc-Gasol-teams",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Marc-Gasol-teams",
                 dataset_doi="10.1234/Marc-Gasol-teams",
-                tags="nba, gasol, teams",
+                tags="gasol, teams, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=3,
                 title="Pau Gasol Playoffs Teams",
                 description="Dataset about Pau-Gasol-playoffs-teams",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Pau-Gasol-playoffs-teams",
                 dataset_doi="10.1234/Pau-Gasol-playoffs-teams",
-                tags="nba, gasol, playoffs",
+                tags="gasol, playoffs, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=4,
                 title="Playoffs 1996-97",
                 description="Dataset about playoffs-1996-97",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYOFFS,
                 publication_doi="10.1234/playoffs-1996-97",
                 dataset_doi="10.1234/playoffs-1996-97",
-                tags="nba, playoffs, 1996",
+                tags="playoffs, 1996, classic-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=5,
                 title="Playoffs Conference Champs",
                 description="Dataset about playoffs-conference-champs",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYOFFS,
                 publication_doi="10.1234/playoffs-conference-champs",
                 dataset_doi="10.1234/playoffs-conference-champs",
-                tags="nba, playoffs, champs",
+                tags="playoffs, conference, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=6,
                 title="Season 2024-25",
                 description="Dataset about season-2024-25",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/season-2024-25",
                 dataset_doi="10.1234/season-2024-25",
-                tags="nba, season, 2024",
+                tags="season, 2024, modern-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=7,
                 title="West Regular Season Champs",
                 description="Dataset about west-regular-season-champs",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/west-regular-season-champs",
                 dataset_doi="10.1234/west-regular-season-champs",
-                tags="nba, west, champs",
+                tags="west, regular-season, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
+                extra_fields="Blocks per game"
             ),
             DSMetaData(
                 deposition_id=8,
                 title="Marc Gasol Playoffs Teams",
                 description="Dataset about Marc-Gasol-playoffs-teams",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Marc-Gasol-playoffs-teams",
                 dataset_doi="10.1234/Marc-Gasol-playoffs-teams",
-                tags="nba, gasol, playoffs",
+                tags="gasol, playoffs, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=9,
                 title="Michael Jordan Teams",
                 description="Dataset about Michael-Jordan-teams",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Michael-Jordan-teams",
                 dataset_doi="10.1234/Michael-Jordan-teams",
-                tags="nba, jordan, teams",
+                tags="jordan, teams, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=10,
                 title="Pau Gasol Teams",
                 description="Dataset about Pau-Gasol-teams",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Pau-Gasol-teams",
                 dataset_doi="10.1234/Pau-Gasol-teams",
-                tags="nba, gasol, teams",
+                tags="gasol, teams, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=11,
                 title="Playoffs 2004-05",
                 description="Dataset about playoffs-2004-05",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.PLAYOFFS,
                 publication_doi="10.1234/playoffs-2004-05",
                 dataset_doi="10.1234/playoffs-2004-05",
-                tags="nba, playoffs, 2004",
+                tags="playoffs, 2004, classic-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=12,
                 title="Season 2023-24",
                 description="Dataset about season-2023-24",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/season-2023-24",
                 dataset_doi="10.1234/season-2023-24",
-                tags="nba, season, 2023",
+                tags="season, 2023, modern-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
                 deposition_id=13,
                 title="Spurs Ring Winners",
                 description="Dataset about spurs-ring-winners",
-                publication_type=PublicationType.DATA_MANAGEMENT_PLAN,
+                publication_type=PublicationType.OTHER,
                 publication_doi="10.1234/spurs-ring-winners",
                 dataset_doi="10.1234/spurs-ring-winners",
-                tags="nba, spurs, rings",
+                tags="spurs, rings, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
+                extra_fields="Blocks per game, Steals per game",
             )
         ]
         seeded_ds_meta_data = self.seed(nba_datasets)
@@ -256,7 +258,6 @@ class DataSetSeeder(BaseSeeder):
         ]
         self.seed(nba_authors)
 
-    
         datasets = [
             DataSet(
                 user_id=user1.id if i % 2 == 0 else user2.id,
@@ -267,15 +268,14 @@ class DataSetSeeder(BaseSeeder):
         ]
         seeded_datasets = self.seed(datasets)
 
-     
         load_dotenv()
         working_dir = os.getenv("WORKING_DIR", "")
         src_folder_csv = os.path.join(working_dir, "app", "modules", "dataset", "csv_examples")
-        
+
         nba_dataset_names = [
-            "east-regular-season-champs", "Marc-Gasol-teams", "Pau-Gasol-playoffs-teams", 
-            "playoffs-1996-97", "playoffs-conference-champs", "season-2024-25", 
-            "west-regular-season-champs", "Marc-Gasol-playoffs-teams", "Michael-Jordan-teams", 
+            "east-regular-season-champs", "Marc-Gasol-teams", "Pau-Gasol-playoffs-teams",
+            "playoffs-1996-97", "playoffs-conference-champs", "season-2024-25",
+            "west-regular-season-champs", "Marc-Gasol-playoffs-teams", "Michael-Jordan-teams",
             "Pau-Gasol-teams", "playoffs-2004-05", "season-2023-24", "spurs-ring-winners"
         ]
 
@@ -285,7 +285,7 @@ class DataSetSeeder(BaseSeeder):
             dataset_folder_path = os.path.join(src_folder_csv, folder_name)
             if os.path.isdir(dataset_folder_path):
                 csv_files = [f for f in os.listdir(dataset_folder_path) if f.endswith('.csv')]
-                
+
                 print(f"Procesando carpeta '{folder_name}': encontrados {len(csv_files)} archivos.")
 
                 for csv_filename in csv_files:
@@ -293,13 +293,13 @@ class DataSetSeeder(BaseSeeder):
                         csv_filename=csv_filename,
                         title=csv_filename.replace(".csv", "").replace("_", " ").title(),
                         description=f"Data file {csv_filename} belonging to {folder_name}",
-                        publication_type=PublicationType.SOFTWARE_DOCUMENTATION,
+                        publication_type=PublicationType.PLAYER,
                         publication_doi=f"10.1234/{csv_filename}",
                         tags="nba, csv, team-data",
                         uvl_version=None
                     )
                     seeded_fm_meta = self.seed([fm_meta])[0]
-                    
+
                     file_author = Author(
                         name="NBA Stats Registry",
                         affiliation="NBA Data Lake",
@@ -316,9 +316,9 @@ class DataSetSeeder(BaseSeeder):
                     src_file_path = os.path.join(dataset_folder_path, csv_filename)
                     dest_folder = os.path.join(working_dir, "uploads", f"user_{user_id}", f"dataset_{dataset.id}")
                     os.makedirs(dest_folder, exist_ok=True)
-                    
+
                     shutil.copy(src_file_path, dest_folder)
-                    
+
                     dest_file_path = os.path.join(dest_folder, csv_filename)
                     hub_file = Hubfile(
                         name=csv_filename,
@@ -327,6 +327,6 @@ class DataSetSeeder(BaseSeeder):
                         feature_model_id=seeded_feature_model.id
                     )
                     self.seed([hub_file])
-            
+
             else:
                 print(f"ADVERTENCIA: No se encontró la carpeta: {dataset_folder_path}")
