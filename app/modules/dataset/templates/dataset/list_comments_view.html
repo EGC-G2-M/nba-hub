@@ -8,14 +8,21 @@
 
     <div class="row">
         <div class="col-12 col-lg-10">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="h4 fw-bold mb-0">
                     Comments <span class="text-muted fs-6 fw-normal">({{ comments|length }})</span>
                 </h1>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                {% if current_user.is_authenticated %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                     data-bs-target="#createCommentModal" data-parent-id="">
                     <i data-feather="edit-2" class="center-button-icon"></i> New comment
                 </button>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        Please <a href="{{ url_for('auth.login') }}" class="alert-link">log in</a> to post a comment.
+                    </div>
+                {% endif %}
+                
             </div>
         </div>
     </div>
