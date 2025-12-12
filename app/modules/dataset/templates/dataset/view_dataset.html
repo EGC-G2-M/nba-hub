@@ -394,7 +394,6 @@
                 </div>
                 {% else %}
 
-                {# NUEVO CONTENEDOR SCROLLABLE #}
                 <div class="list-group comment-scroll-container">
                     {% for comment in parent_comments %}
                     <div class="list-group-item">
@@ -402,7 +401,7 @@
                             <div class="col-12">
                                 <div class="row">
                                     <div class="col-8">
-                                        <i data-feather="message-square"></i> {{ comment.content }}
+                                        <i data-feather="message-circle"></i> {{ comment.content }}
                                         <br>
                                     </div>
                                     <div class="col-2">
@@ -413,7 +412,6 @@
                     </div>
                     {% endfor %}
                 </div>
-                {# FIN DEL CONTENEDOR SCROLLABLE #}
 
                 {% endif %}
 
