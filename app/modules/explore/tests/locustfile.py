@@ -62,6 +62,27 @@ class ExploreBehavior(TaskSet):
         if response.status_code != 200:
             print(f"Explore GET failed: {response.status_code}")
 
+    @task
+    def filter_by_extra_field_query(self):
+        """Simula una búsqueda por una palabra clave que solo está en extra_fields"""
+        
+        payload = {
+            "query": "Steals", 
+            "sorting": "newest",
+            "publication_type": "any",
+            "start_date": "",
+            "end_date": ""
+        }
+        
+        response = self.client.post(
+            "/explore",
+            json=payload,
+            name="/explore [POST] - Filter Extra Fields"
+        )
+
+        if response.status_code != 200:
+            print(f"Explore POST filter failed: {response.status_code}")
+
 
 class ExploreUser(HttpUser):
     tasks = [ExploreBehavior]
