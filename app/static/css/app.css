@@ -13158,7 +13158,12 @@ a.list-group-item {
 }
 
 .main {
-    background: #f5f7fb;
+    background-image: 
+        url('../img/photos/basketballBackground.png');
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center center; 
+    background-attachment: fixed;
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
     display: flex;
@@ -13167,7 +13172,8 @@ a.list-group-item {
     min-width: 0;
     overflow: hidden;
     transition: margin-left .35s ease-in-out, left .35s ease-in-out, margin-right .35s ease-in-out, right .35s ease-in-out;
-    width: 100%
+    width: 100%;
+    position: relative; 
 }
 
 .navbar {
@@ -14873,5 +14879,42 @@ span.flatpickr-weekday {
     padding: 0px; 
 }
 
+
+/* Contenedor de la tarjeta de perfil */
+.card-profile {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background-color: white;
+}
+
+/* El "marco" de la foto */
+.profile-img-container {
+    width: 100%;
+    /* Aumentamos aquí la altura para que sea más alta */
+    height: 480px; 
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+.profile-img-container img {
+    width: 100%;
+    height: 100%;
+    /* 'cover' para que no haya bordes blancos laterales */
+    object-fit: cover; 
+    /* 'top' para que si la foto es muy alta, empiece recortando por los pies y no por la cabeza */
+    object-position: top center; 
+    display: block;
+}
+
+.card-profile .card-body {
+    padding: 1.5rem;
+}
+
+.card-profile .card-title {
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+}
 
 /*# sourceMappingURL=app.css.map*/

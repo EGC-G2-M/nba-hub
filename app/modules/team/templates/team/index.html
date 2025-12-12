@@ -4,71 +4,174 @@
 
 {% block content %}
 
-    <h1 class="h3 mb-3"><b>Team</b></h1>
+<h1 class="h3 mb-3"><b>Team</b></h1>
 
 
-    <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 row-cols-12 g-4">
+<div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 row-cols-12 g-4">
 
-        <div class="col">
+    <div class="col">
 
-            <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/logos/university_of_seville.svg') }}"
-                     class="card-img-top custom-img" alt="University of Seville">
-                <div class="card-body custom-card-body">
-                    <h5 class="card-title">University of Seville, Spain</h5>
-                    <p class="card-text">
-                        Performs active development of the application and is responsible for code maintenance,
-                        deployment, operation of services and new functionalities.
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <a href="http://www.us.es" target="_blank">www.us.es</a>
-                </div>
+        <div class="card h-100">
+            <img src="{{ url_for('static', filename='img/logos/university_of_seville.svg') }}"
+                class="card-img-top custom-img" alt="University of Seville">
+            <div class="card-body custom-card-body">
+                <h5 class="card-title">University of Seville, Spain</h5>
+                <p class="card-text">
+                    Performs active development of the application and is responsible for code maintenance,
+                    deployment, operation of services and new functionalities.
+                </p>
             </div>
-
-        </div>
-
-        <div class="col">
-
-            <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/logos/university_of_malaga.svg') }}"
-                     class="card-img-top custom-img" alt="University of Malaga">
-                <div class="card-body custom-card-body">
-                    <h5 class="card-title">University of Malaga, Spain</h5>
-                    <p class="card-text">
-                        Responsible for active research, technical support
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <a href="http://www.uma.es" target="_blank">www.uma.es</a>
-                </div>
+            <div class="card-footer">
+                <a href="http://www.us.es" target="_blank">www.us.es</a>
             </div>
-
-        </div>
-
-        <div class="col">
-
-            <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/logos/university_of_ulm.svg') }}"
-                     class="card-img-top custom-img" alt="University of Ulm">
-                <div class="card-body custom-card-body">
-                    <h5 class="card-title">University of Ulm, Germany</h5>
-                    <p class="card-text">
-                        Provides population of consistent datasets with rich metadata for initial loading of models into
-                        UVL. Responsible for the UVL parser. Active research.
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <a href="http://www.uni-ulm.de" target="_blank">www.uni-ulm.de</a>
-                </div>
-            </div>
-
         </div>
 
     </div>
 
+    <div class="col">
+
+        <div class="card h-100">
+            <img src="{{ url_for('static', filename='img/photos/egc.png') }}" class="card-img-top custom-img" alt="EGC">
+            <div class="card-body custom-card-body">
+                <h5 class="card-title">EGC, Spain</h5>
+                <p class="card-text">
+                    The research group worked on this project as part of this subject of University of Seville.
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="https://1984.lsi.us.es/wiki-egc/" target="_blank">1984.lsi.us.es/wiki-egc/</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col">
+
+        <div class="card h-100">
+            <img src="{{ url_for('static', filename='img/logos/nbaLogo.png') }}" class="card-img-top custom-img"
+                alt="National Basketball Association">
+            <div class="card-body custom-card-body">
+                <h5 class="card-title">National Basketball Association, USA</h5>
+                <p class="card-text">
+                    Basketball professional league in North America that has provided support and funding for the
+                    project.
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="https://www.nba.com" target="_blank">nba.com</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-profile">
+            <div class="profile-img-container">
+                <img src="{{ url_for('static', filename='img/photos/davidBasallote.png') }}" alt="David Basallote">
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title"><b>David Basallote</b></h5>
+                <p class="text-muted small">Cádiz</p>
+                <p class="card-text">
+                    Computer Science student at University of Seville. He has worked on the development of the
+                    application as part of the subject of EGC.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-profile">
+            <div class="profile-img-container">
+                <img src="{{ url_for('static', filename='img/photos/davidChaves.png') }}" alt="David Chaves">
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title"><b>David Chaves</b></h5>
+                <p class="text-muted small">Sevilla</p>
+                <p class="card-text">
+                    Computer Science student at University of Seville. He has worked on the development of the
+                    application as part of the subject of EGC.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-profile">
+            <div class="profile-img-container">
+                <img src="{{ url_for('static', filename='img/photos/franciscoGago.png') }}" alt="Francisco Gago">
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title"><b>Francisco Gago</b></h5>
+                <p class="text-muted small">Sevilla</p>
+                <p class="card-text">
+                    Computer Science student at University of Seville. He has worked on the development of the
+                    application as part of the subject of EGC.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-profile">
+            <div class="profile-img-container">
+                <img src="{{ url_for('static', filename='img/photos/guillermoGonzalez.png') }}" alt="Guillermo Gonzalez">
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title"><b>Guillermo Gonzalez</b></h5>
+                <p class="text-muted small">Sevilla</p>
+                <p class="card-text">
+                    Computer Science student at University of Seville. He has worked on the development of the
+                    application as part of the subject of EGC.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-profile">
+            <div class="profile-img-container">
+                <img src="{{ url_for('static', filename='img/photos/marcoHerrera.png') }}" alt="Marco Herrera">
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title"><b>Marco Herrera</b></h5>
+                <p class="text-muted small">Sevilla</p>
+                <p class="card-text">
+                    Computer Science student at University of Seville. He has worked on the development of the
+                    application as part of the subject of EGC.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-profile">
+            <div class="profile-img-container">
+                <img src="{{ url_for('static', filename='img/photos/rafaelRodriguez.png') }}" alt="Rafael Rodriguez">
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title"><b>Rafael Rodriguez</b></h5>
+                <p class="text-muted small">Huelva</p>
+                <p class="card-text">
+                    Computer Science student at University of Seville. He has worked on the development of the
+                    application as part of the subject of EGC.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+
+</div>
+
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('team.scripts') }}"></script>
+<script src="{{ url_for('team.scripts') }}"></script>
 {% endblock %}
