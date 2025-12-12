@@ -29,16 +29,6 @@ dataset_service = DataSetService()
 
 comment_serializer = Serializer(serialization_fields=COMMENT_SERIALIZATION_FIELDS) 
 
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_admin:
-            return jsonify({"message": "Forbidden: Administrator access required."}), 403
-        return f(*args, **kwargs)
-    return decorated_function
-
-# RUTAS DE USUARIO 
 @comment_bp.route("/datasets/<int:dataset_id>/comments", methods=["POST"])
 @login_required
 def create_comment(dataset_id):    
@@ -73,46 +63,28 @@ def create_comment(dataset_id):
 @comment_bp.route("/<int:comment_id>/delete", methods=["POST"])
 @login_required
 def delete_comment_route(comment_id):
-    dataset_id = None
     redirect_url = url_for("public.index")
-
     try:
-        is_admin_user = current_user.is_admin
-        
-        comment = comment_service.find_by_id(comment_id)
-        if not comment:
-            raise NotFound("Comment not found.")
+        comment = comment_service.get_comment(comment_id)
+        if comment:
+            dataset_id_temp = comment.dataset_id 
+            comment_service.delete_comment(
+                comment_id=comment_id,
+                acting_user_id=current_user.id 
+            )
+            flash("Comment deleted successfully", "success")
+        else:
+            flash("Comment not found", "danger")
 
-        dataset_id = comment.dataset_id
-
-        comment_service.delete_comment(
-            comment_id=comment_id, 
-            current_user_id=current_user.id, 
-            is_admin=is_admin_user
-        )
-        flash("Comment deleted successfully.", "success")
-        
-        dataset = dataset_service.find_by_id(dataset_id)
-        if dataset and dataset.doi:
-             redirect_url = url_for("dataset.subdomain_index", doi=dataset.doi)
-
-    except (PermissionError, NotFound, ValueError) as exc:
-        flash(f"Error deleting comment: {exc}", "danger")
-        if dataset_id:
-             dataset = dataset_service.find_by_id(dataset_id)
-             if dataset and dataset.doi:
-                redirect_url = url_for("dataset.subdomain_index", doi=dataset.doi)
-    except Exception:
-        flash("An unexpected error occurred while deleting the comment.", "danger")
-        
-    return redirect(redirect_url)
+    except Exception as e:
+        flash(f"Error deleting comment: {e}", "danger")
+    return redirect(request.referrer or url_for('main.index'))
 
 
 @comment_bp.route("/<int:comment_id>/vote", methods=["POST"])
 @login_required
-def toggle_vote_route(comment_id):
-    data = request.get_json()
-    vote_type = data.get('vote_type')
+def toggle_vote(comment_id):
+    vote_type = int(request.form.get('vote_type'))
     
     if vote_type not in [VOTE_LIKE, VOTE_DISLIKE]:
         raise BadRequest("Invalid vote type provided.")
@@ -123,79 +95,51 @@ def toggle_vote_route(comment_id):
             user_id=current_user.id,
             new_vote_type=vote_type
         )
+        flash("Vote updated successfully", "success") 
+
+    except ValueError:
+        flash("Invalid vote", "danger")
+    except Exception as e:
+        flash(f"Error voting: {str(e)}", "danger")
+
+    return redirect(request.referrer)
+
+@comment_bp.app_template_filter('check_vote')
+def check_vote_filter(comment, user):
+    """
+    Filtro para usar en HTML: {{ comment | check_vote(current_user) }}
+    Devuelve: 1 (Like), -1 (Dislike) o 0 (Nada)
+    """
+    if not user or not user.is_authenticated:
+        return 0
         
-        return jsonify({
-            "success": True,
-            "likes": updated_comment.likes,
-            "dislikes": updated_comment.dislikes
-        }), 200
+    if hasattr(comment, 'votes'):
+        for vote in comment.votes:
+            if vote.user_id == user.id:
+                return vote.vote_type
+            
+    return 0
 
-    except Exception as exc:
-        return jsonify({"success": False, "message": str(exc)}), 400
-
-
-# RUTAS DE ADMIN
-@comment_bp.route('/<int:comment_id>/pin', methods=['POST'])
+# AUTOR
+@comment_bp.route("/<int:comment_id>/pin", methods=["POST"])
 @login_required
-@admin_required
-def toggle_pin_route(comment_id):
-    data = request.get_json()
-    pin_status = data.get('pin')
-    
-    if pin_status is None or not isinstance(pin_status, bool):
-        return jsonify({"message": "Missing or invalid 'pin' status"}), 400
-
+def toggle_pin(comment_id):
     try:
-        updated_comment = comment_service.toggle_pin(comment_id, pin_status)
-        return jsonify({
-            "message": "Pin status updated successfully.",
-            "comment": comment_serializer.serialize(updated_comment) 
-        }), 200
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
-    except Exception:
-        return jsonify({"message": "Internal error"}), 500
+        action = request.form.get('pin_action', 'pin')
+        should_pin = (action == 'pin')
 
+        comment_service.toggle_pin(
+            comment_id=comment_id,
+            pin=should_pin,
+            acting_user_id=current_user.id
+        )
+        
+        msg = "Comment pinned" if should_pin else "Comment unpinned"
+        flash(msg, "success")
 
-@comment_bp.route('/<int:comment_id>/hide', methods=['POST'])
-@login_required
-@admin_required
-def toggle_hide_route(comment_id):
-    data = request.get_json()
-    hidden_status = data.get('hidden')
-    
-    if hidden_status is None or not isinstance(hidden_status, bool):
-        return jsonify({"message": "Missing or invalid 'hidden' status"}), 400
+    except PermissionError:
+        flash("Only the dataset owner can pin comments", "danger")
+    except Exception as e:
+        flash(f"Error pinning comment: {str(e)}", "danger")
 
-    try:
-        updated_comment = comment_service.toggle_hide(comment_id, hidden_status)
-        return jsonify({
-            "message": "Hide status updated successfully. Pinned status adjusted automatically.",
-            "comment": comment_serializer.serialize(updated_comment) 
-        }), 200
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
-    except Exception:
-        return jsonify({"message": "Internal error"}), 500
-
-
-@comment_bp.route('/<int:comment_id>/report', methods=['POST'])
-@login_required
-@admin_required
-def toggle_report_route(comment_id):
-    data = request.get_json()
-    reported_status = data.get('reported')
-    
-    if reported_status is None or not isinstance(reported_status, bool):
-        return jsonify({"message": "Missing or invalid 'reported' status"}), 400
-
-    try:
-        updated_comment = comment_service.toggle_report(comment_id, reported_status) 
-        return jsonify({
-            "message": "Report status updated successfully. Pinned status adjusted automatically.",
-            "comment": comment_serializer.serialize(updated_comment)
-        }), 200
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
-    except Exception:
-        return jsonify({"message": "Internal error"}), 500
+    return redirect(request.referrer)

@@ -207,6 +207,19 @@ chico sundermann">
             </div>
         </nav>
 
+        <div id="flash-overlay-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow auto-dismiss" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
         <main class="content">
             <div class="container p-0">
 
@@ -239,6 +252,7 @@ chico sundermann">
         </footer>
     </div>
 </div>
+
 
 <pre id="bibtex_cite" style="display: none">
 @article{romero2024_uvlhub_open_science,
@@ -312,6 +326,25 @@ Romero-Organvidez, D., Galindo, J. A., Sundermann, C., Horcas, J.-M., & Benavide
         navigator.clipboard.writeText(textToCopy);
     }
 
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var alerts = document.querySelectorAll('.auto-dismiss');
+        
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                try {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                } catch (e) {
+                    alert.style.transition = "opacity 0.5s ease";
+                    alert.style.opacity = "0";
+                    setTimeout(function() { alert.remove(); }, 500);
+                }
+            }, 2000);
+        });
+    });
 </script>
 
 {% block scripts %}{% endblock %}

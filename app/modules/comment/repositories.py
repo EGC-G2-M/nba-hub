@@ -61,3 +61,6 @@ class CommentRepository(BaseRepository):
         
     def delete_vote(self, vote: CommentVote):
         db.session.delete(vote)
+
+    def find_by_id(self, comment_id: int) -> Comment:
+        return self.model.query.filter_by(id=comment_id).first()
