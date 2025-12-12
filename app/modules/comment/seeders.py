@@ -12,6 +12,10 @@ class CommentSeeder(BaseSeeder):
     priority = 20
     
     def run(self):
+        if db.session.query(Comment).count() > 0:
+            click.echo(click.style("INFO: Ya existen comentarios en la BD. Saltando CommentSeeder.", fg="yellow"))
+            return
+        
         RANDOM_COMMENTS = [ 
             "This dataset is very comprehensive, thank you for sharing!",
             "The data organization is nice.",
@@ -25,8 +29,7 @@ class CommentSeeder(BaseSeeder):
         ]
 
         RANDOM_VOTES = [1, -1, 0, 1, 1, -1, 0, 1, -1, 0]
-
-
+    
         users = User.query.all()
         all_datasets = DataSet.query.order_by(DataSet.id.desc()).all()
 
@@ -46,16 +49,7 @@ class CommentSeeder(BaseSeeder):
         user_pg = users[2]
         user_mg = users[3]
         all_users = users
-
-        try:
-            db.session.query(CommentVote).delete()
-            db.session.query(Comment).delete() 
-            db.session.commit()
-        except Exception as e:
-            click.echo(click.style(f"⚠️ ERROR AL LIMPIAR VOTOS/COMENTARIOS: {e}", fg="red", bold=True))
-            db.session.rollback()
-            raise
-
+        
         try:
             # 1. DATASET WITH ONE COMMENT WITH REPLIES
             parent_comment = Comment(
