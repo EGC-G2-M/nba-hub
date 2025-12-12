@@ -14880,4 +14880,41 @@ span.flatpickr-weekday {
 }
 
 
+/* Contenedor de la tarjeta de perfil */
+.card-profile {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background-color: white;
+}
+
+/* El "marco" de la foto */
+.profile-img-container {
+    width: 100%;
+    /* Aumentamos aquí la altura para que sea más alta */
+    height: 480px; 
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+.profile-img-container img {
+    width: 100%;
+    height: 100%;
+    /* 'cover' para que no haya bordes blancos laterales */
+    object-fit: cover; 
+    /* 'top' para que si la foto es muy alta, empiece recortando por los pies y no por la cabeza */
+    object-position: top center; 
+    display: block;
+}
+
+.card-profile .card-body {
+    padding: 1.5rem;
+}
+
+.card-profile .card-title {
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+}
+
 /*# sourceMappingURL=app.css.map*/
