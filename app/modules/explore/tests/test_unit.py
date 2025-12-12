@@ -256,3 +256,94 @@ def test_filter_none_dates(test_client, test_datasets_with_dates):
         
         # No debería lanzar error y debería devolver todos los datasets
         assert len(result) >= 3, f"Se esperaban al menos 3 datasets con None"
+
+@pytest.fixture(scope="function")
+def test_datasets_with_extra_fields(test_client):
+    """
+    Crea datasets con campos extra definidos para probar el filtrado.
+    El formato de extra_fields es una cadena separada por comas.
+    """
+    dataset_ids = []
+    metadata_ids = []
+    
+    with test_client.application.app_context():
+        user = User.query.filter_by(email="extra_fields_user@example.com").first()
+        if not user:
+            user = User(email="extra_fields_user@example.com", password="1234")
+            db.session.add(user)
+            db.session.commit()
+
+        # Dataset 1: Contiene 'Blocks per game' y 'Steals per game' (ID 1)
+        meta_mid = DSMetaData(
+            title="Blocks & Steals Dataset",
+            description="Dataset with Blocks and Steals metrics.",
+            publication_type=PublicationType.PLAYER,
+            dataset_doi="10.1234/blocks-steals",
+            tags="nba, metrics",
+            extra_fields="Blocks per game, Steals per game"
+        )
+        db.session.add(meta_mid)
+        db.session.commit()
+        metadata_ids.append(meta_mid.id)
+        
+        ds_mid = DataSet(
+            user_id=user.id,
+            ds_meta_data_id=meta_mid.id,
+            created_at=datetime.now(timezone.utc) - timedelta(days=30)
+        )
+        db.session.add(ds_mid)
+        db.session.commit()
+        dataset_ids.append(ds_mid.id)
+
+        # Dataset 2: Contiene solo 'Blocks per game' (ID 2)
+        meta_recent = DSMetaData(
+            title="Only Blocks Dataset",
+            description="Dataset with Blocks only.",
+            publication_type=PublicationType.PLAYOFFS,
+            dataset_doi="10.1234/only-blocks",
+            tags="nba, blocks",
+            extra_fields="Blocks per game"
+        )
+        db.session.add(meta_recent)
+        db.session.commit()
+        metadata_ids.append(meta_recent.id)
+        
+        ds_recent = DataSet(
+            user_id=user.id,
+            ds_meta_data_id=meta_recent.id,
+            created_at=datetime.now(timezone.utc) - timedelta(days=5)
+        )
+        db.session.add(ds_recent)
+        db.session.commit()
+        dataset_ids.append(ds_recent.id)
+
+        # Dataset 3: Sin campos extra relevantes (ID 3)
+        meta_old = DSMetaData(
+            title="Old Generic Dataset",
+            description="Dataset without extra fields.",
+            publication_type=PublicationType.SEASON,
+            dataset_doi="10.1234/generic-old",
+            tags="generic"
+        )
+        db.session.add(meta_old)
+        db.session.commit()
+        metadata_ids.append(meta_old.id)
+        
+        ds_old = DataSet(
+            user_id=user.id,
+            ds_meta_data_id=meta_old.id,
+            created_at=datetime.now(timezone.utc) - timedelta(days=60)
+        )
+        db.session.add(ds_old)
+        db.session.commit()
+        dataset_ids.append(ds_old.id)
+
+        db.session.commit()
+        
+    yield dataset_ids # Retorna los IDs para el cleanup
+    
+    # Cleanup
+    with test_client.application.app_context():
+        DataSet.query.filter(DataSet.id.in_(dataset_ids)).delete(synchronize_session=False)
+        DSMetaData.query.filter(DSMetaData.id.in_(metadata_ids)).delete(synchronize_session=False)
+        db.session.commit()
