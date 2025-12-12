@@ -14,5 +14,10 @@ def index():
 
     if request.method == "POST":
         criteria = request.get_json()
-        datasets = ExploreService().filter(**criteria)
-        return jsonify([dataset.to_dict() for dataset in datasets])
+        try:
+            datasets = ExploreService().filter(**criteria)
+            return jsonify([dataset.to_dict() for dataset in datasets])
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception as e:
+            return jsonify({"error": "An unexpected error occurred."}), 500
