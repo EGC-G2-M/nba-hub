@@ -4,6 +4,7 @@ from flask import render_template
 
 from app.modules.dataset.services import DataSetService
 from app.modules.featuremodel.services import FeatureModelService
+from app.modules.comment.services import CommentService
 from app.modules.public import public_bp
 
 logger = logging.getLogger(__name__)
@@ -14,10 +15,15 @@ def index():
     logger.info("Access index")
     dataset_service = DataSetService()
     feature_model_service = FeatureModelService()
+    comment_service = CommentService()
 
     # Statistics: total datasets and feature models
     datasets_counter = dataset_service.count_synchronized_datasets()
     feature_models_counter = feature_model_service.count_feature_models()
+    
+    # Statistics: total comments
+    parent_comments_counter = comment_service.count_total_parent_comments()
+    replies_counter = comment_service.count_total_replies()
 
     # Statistics: total downloads
     total_dataset_downloads = dataset_service.total_dataset_downloads()
@@ -31,6 +37,8 @@ def index():
         "public/index.html",
         datasets=dataset_service.latest_synchronized(),
         datasets_counter=datasets_counter,
+        parent_comments_counter=parent_comments_counter,
+        replies_counter=replies_counter,
         feature_models_counter=feature_models_counter,
         total_dataset_downloads=total_dataset_downloads,
         total_feature_model_downloads=total_feature_model_downloads,

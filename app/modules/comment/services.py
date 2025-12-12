@@ -14,6 +14,12 @@ class CommentService(BaseService):
         super().__init__(repo)
         self.comment_repository: CommentRepository = repo
 
+    def count_total_parent_comments(self) -> int:
+        return db.session.query(Comment.id).filter(Comment.parent_id == None).count()
+    
+    def count_total_replies(self) -> int:
+        return db.session.query(Comment.id).filter(Comment.parent_id != None).count()
+    
     def get_comment(self, comment_id: int) -> Comment:
         return self.comment_repository.find_by_id(comment_id)
 
