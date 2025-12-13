@@ -9,9 +9,7 @@
           content="Repository of feature models in UVL format integrated with Zenodo and FlamaPy">
     <meta name="author" content="University of Seville">
     <meta name="keywords"
-          content="diversolab, uvl, feature models, software product line, university of seville,
-           university of malaga, university of ulm, david romero, david benavides, jose a galindo, jose miguel horcas,
-chico sundermann">
+          content="diversolab, uvl, feature models, software product line, university of seville, nba-hub, uvlhub">
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="shortcut icon" href="{{ url_for("static", filename="img/icons/nba-hub-icon-250x250.png") }}"/>
@@ -207,6 +205,19 @@ chico sundermann">
             </div>
         </nav>
 
+        <div id="flash-overlay-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow auto-dismiss" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
         <main class="content">
             <div class="container p-0">
 
@@ -220,14 +231,13 @@ chico sundermann">
                 <div class="row text-muted">
                     <div class="col-6 text-start">
                         <p class="mb-0">
-                            <strong>{{ FLASK_APP_NAME }} </strong> University of Seville · University of Malaga ·
-                            University of Ulm
+                            <strong>NBAHub</strong> University of Seville · EGC · National Basketball Association
                         </p>
                     </div>
                     <div class="col-6 text-end">
                         <ul class="list-inline">
                             <li class="list-inline-item">
-                                <a class="text-muted" href="https://github.com/diverso-lab/uvlhub"
+                                <a class="text-muted" href="https://github.com/EGC-G2-M/nba-hub"
                                    target="_blank">
                                     <i class="align-middle" data-feather="github"></i>
                                     Repository on GitHub</a>
@@ -239,6 +249,7 @@ chico sundermann">
         </footer>
     </div>
 </div>
+
 
 <pre id="bibtex_cite" style="display: none">
 @article{romero2024_uvlhub_open_science,
@@ -312,6 +323,25 @@ Romero-Organvidez, D., Galindo, J. A., Sundermann, C., Horcas, J.-M., & Benavide
         navigator.clipboard.writeText(textToCopy);
     }
 
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var alerts = document.querySelectorAll('.auto-dismiss');
+        
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                try {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                } catch (e) {
+                    alert.style.transition = "opacity 0.5s ease";
+                    alert.style.opacity = "0";
+                    setTimeout(function() { alert.remove(); }, 500);
+                }
+            }, 2000);
+        });
+    });
 </script>
 
 {% block scripts %}{% endblock %}

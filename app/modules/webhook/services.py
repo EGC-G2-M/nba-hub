@@ -7,7 +7,18 @@ import docker
 from app.modules.webhook.repositories import WebhookRepository
 from core.services.BaseService import BaseService
 
-client = docker.from_env()
+_client = None
+
+
+def get_docker_client():
+    """Get or create the Docker client lazily."""
+    global _client
+    if _client is None:
+        try:
+            _client = docker.from_env()
+        except docker.errors.DockerException:
+            return None
+    return _client
 
 
 class WebhookService(BaseService):
@@ -16,6 +27,9 @@ class WebhookService(BaseService):
 
     def get_web_container(self):
         try:
+            client = get_docker_client()
+            if client is None:
+                abort(503, description="Docker is not available.")
             return client.containers.get("web_app_container")
         except docker.errors.NotFound:
             abort(404, description="Web container not found.")
