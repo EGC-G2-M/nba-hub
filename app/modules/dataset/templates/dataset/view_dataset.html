@@ -315,14 +315,9 @@
                                     <ul class="dropdown-menu" aria-labelledby="btnGroupDropExport{{ file.id }}">
                                         <li>
                                             <a class="dropdown-item"
-                                                href="{{ url_for('hubfile.download_file', file_id=file.id) }}">
+                                                href="{{ url_for('hubfile.download_file', file_id=file.id) }}"
+                                                onclick="event.preventDefault(); recordCounterFile('{{ dataset.id }}', this.href);">
                                                 CSV
-                                                <script>
-                                                    function recordCounterFile(datasetId, targetUrl) {
-                                                        fetch('/file/count_download/' + datasetId).catch(() => { });
-                                                        window.open(targetUrl, '_blank');
-                                                    }
-                                                </script>
                                             </a>
                                     </ul>
                                 </div>
@@ -576,6 +571,15 @@
         ... (Código comentado de valid) ...
     }
     */
+
+    function recordCounterFile(datasetId, targetUrl) {
+        try {
+            fetch('/file/count_download/' + datasetId).catch(() => { });
+        } catch (e) {
+        }
+        window.open(targetUrl, '_blank');
+    }
+
 
     function copyToClipboard() {
         const text = document.getElementById('fileContent').textContent;
