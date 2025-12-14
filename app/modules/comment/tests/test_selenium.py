@@ -115,3 +115,47 @@ class TestAuthorpincomment():
     self.driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .d-flex > .d-inline:nth-child(1) svg").click()
     self.driver.find_element(By.LINK_TEXT, "Doncic, Luka").click()
     self.driver.find_element(By.LINK_TEXT, "Log out").click()
+    
+class TestCommentdataset():
+  def setup_method(self, method):
+    self.driver = webdriver.Firefox()
+    self.vars = {}
+  
+  def teardown_method(self, method):
+    self.driver.quit()
+  
+  def test_commentdataset(self):
+    self.driver.get("http://localhost/")
+    self.driver.set_window_size(706, 923)
+    self.driver.find_element(By.LINK_TEXT, "Login").click()
+    self.driver.find_element(By.ID, "email").click()
+    self.driver.find_element(By.ID, "email").send_keys("user3@example.com")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("1234")
+    self.driver.find_element(By.ID, "submit").click()
+    self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".d-flex > .btn:nth-child(1)").click()
+    self.driver.find_element(By.ID, "commentContent").click()
+    self.driver.find_element(By.ID, "commentContent").send_keys("I like!")
+    self.driver.find_element(By.ID, "submit").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".justify-content-between > .btn").click()
+    self.driver.find_element(By.ID, "commentContent").click()
+    self.driver.find_element(By.ID, "commentContent").send_keys("Thanks for sharing!!!")
+    self.driver.find_element(By.ID, "submit").click()
+    self.driver.find_element(By.LINK_TEXT, "Gasol, Pau").click()
+    self.driver.find_element(By.LINK_TEXT, "Log out").click()
+
+class TestViewcomments():
+  def setup_method(self, method):
+    self.driver = webdriver.Firefox()
+    self.vars = {}
+  
+  def teardown_method(self, method):
+    self.driver.quit()
+  
+  def test_viewcomments(self):
+    self.driver.get("http://localhost/")
+    self.driver.set_window_size(706, 923)
+    self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
+    self.driver.find_element(By.LINK_TEXT, "View all comments").click()
+  
