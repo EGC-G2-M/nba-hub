@@ -195,6 +195,20 @@ class DataSetService(BaseService):
     def get_top5_trending_datasets_last_30_days(self):
         return self.repository.get_top5_trending_datasets_last_30_days()
 
+    def get_related_datasets(self, dataset_id: int):
+        
+        dataset = self.repository.find_by_id(dataset_id)
+        if not dataset:
+            return []
+
+        tags = []
+        if dataset.ds_meta_data.tags:
+            tags = [t.strip() for t in dataset.ds_meta_data.tags.split(',') if t.strip()]
+
+        authors = [author.name for author in dataset.ds_meta_data.authors]
+
+        return self.repository.get_related_datasets(dataset_id, tags, authors)
+
 
 class AuthorService(BaseService):
     def __init__(self):

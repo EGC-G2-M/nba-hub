@@ -95,7 +95,7 @@ def trending_test_data(test_client, clean_database):
             meta = DSMetaData(
                 title=f"Trending Dataset {i}",
                 description=f"A dataset for testing trending datasets {i}.",
-                publication_type=(PublicationType.JOURNAL_ARTICLE if i % 2 == 1 else PublicationType.CONFERENCE_PAPER)
+                publication_type=(PublicationType.PLAYER if i % 2 == 1 else PublicationType.SEASON)
             )
             db.session.add(meta)
             db.session.flush()

@@ -238,8 +238,8 @@ def download_dataset(dataset_id):
 
     return resp
 
-@dataset_bp.route("/file/download/<int:dataset_id>", methods=["GET"])
-def download_file(dataset_id):
+@dataset_bp.route("/file/count_download/<int:dataset_id>", methods=["GET"])
+def record_file_download(dataset_id):
     dataset = dataset_service.get_or_404(dataset_id)
     user_cookie = request.cookies.get("download_cookie")
     if not user_cookie:
@@ -253,6 +253,9 @@ def download_file(dataset_id):
     if not existing_record:
         DSDownloadRecordService().create_new_record(dataset=dataset, user_cookie=user_cookie)
         dataset_service.increment_download_count(dataset_id)
+
+    # Return a small JSON response so fetch()/AJAX callers don't receive a 404/empty response
+    return jsonify({"success": True}), 200
 
 @dataset_bp.route("/datasets/<int:dataset_id>/stats", methods=["GET"])
 def dataset_stats(dataset_id):
@@ -305,6 +308,7 @@ def subdomain_index(doi):
         abort(404)
 
     dataset = ds_meta_data.data_set
+    related_datasets = dataset_service.get_related_datasets(dataset.id)
     parent_comments_count= comment_service.get_parent_comments_for_dataset_count(dataset.id)
     parent_comments= comment_service.get_parent_comments_for_dataset(dataset.id)
     
@@ -315,7 +319,8 @@ def subdomain_index(doi):
                             dataset=dataset, 
                             parent_comments_count= parent_comments_count,
                             parent_comments= parent_comments,
-                            comment_form= comment_form
+                            comment_form= comment_form,
+                            related_datasets=related_datasets
     ))
     resp.set_cookie("view_cookie", user_cookie)
 

@@ -29,13 +29,13 @@ class DataSetSeeder(BaseSeeder):
 
         nba_datasets = [
             DSMetaData(
-                deposition_id=1,  # Empezamos en 1
+                deposition_id=1,
                 title="East Regular Season Champs",
                 description="Dataset about east-regular-season-champs",
                 publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/east-regular-season-champs",
                 dataset_doi="10.1234/east-regular-season-champs",
-                tags="nba, east, champs",
+                tags="east, regular-season, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -45,7 +45,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Marc-Gasol-teams",
                 dataset_doi="10.1234/Marc-Gasol-teams",
-                tags="nba, gasol, teams",
+                tags="gasol, teams, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -55,7 +55,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Pau-Gasol-playoffs-teams",
                 dataset_doi="10.1234/Pau-Gasol-playoffs-teams",
-                tags="nba, gasol, playoffs",
+                tags="gasol, playoffs, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -65,7 +65,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYOFFS,
                 publication_doi="10.1234/playoffs-1996-97",
                 dataset_doi="10.1234/playoffs-1996-97",
-                tags="nba, playoffs, 1996",
+                tags="playoffs, 1996, classic-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -75,7 +75,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYOFFS,
                 publication_doi="10.1234/playoffs-conference-champs",
                 dataset_doi="10.1234/playoffs-conference-champs",
-                tags="nba, playoffs, champs",
+                tags="playoffs, conference, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -85,7 +85,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/season-2024-25",
                 dataset_doi="10.1234/season-2024-25",
-                tags="nba, season, 2024",
+                tags="season, 2024, modern-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -95,7 +95,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/west-regular-season-champs",
                 dataset_doi="10.1234/west-regular-season-champs",
-                tags="nba, west, champs",
+                tags="west, regular-season, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
                 extra_fields="Blocks per game"
             ),
@@ -106,7 +106,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Marc-Gasol-playoffs-teams",
                 dataset_doi="10.1234/Marc-Gasol-playoffs-teams",
-                tags="nba, gasol, playoffs",
+                tags="gasol, playoffs, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -116,7 +116,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Michael-Jordan-teams",
                 dataset_doi="10.1234/Michael-Jordan-teams",
-                tags="nba, jordan, teams",
+                tags="jordan, teams, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -126,7 +126,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYER,
                 publication_doi="10.1234/Pau-Gasol-teams",
                 dataset_doi="10.1234/Pau-Gasol-teams",
-                tags="nba, gasol, teams",
+                tags="gasol, teams, legends",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -136,7 +136,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.PLAYOFFS,
                 publication_doi="10.1234/playoffs-2004-05",
                 dataset_doi="10.1234/playoffs-2004-05",
-                tags="nba, playoffs, 2004",
+                tags="playoffs, 2004, classic-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -146,7 +146,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.SEASON,
                 publication_doi="10.1234/season-2023-24",
                 dataset_doi="10.1234/season-2023-24",
-                tags="nba, season, 2023",
+                tags="season, 2023, modern-era",
                 ds_metrics_id=seeded_ds_metrics.id,
             ),
             DSMetaData(
@@ -156,7 +156,7 @@ class DataSetSeeder(BaseSeeder):
                 publication_type=PublicationType.OTHER,
                 publication_doi="10.1234/spurs-ring-winners",
                 dataset_doi="10.1234/spurs-ring-winners",
-                tags="nba, spurs, rings",
+                tags="spurs, rings, champs",
                 ds_metrics_id=seeded_ds_metrics.id,
                 extra_fields="Blocks per game, Steals per game",
             )
@@ -293,7 +293,7 @@ class DataSetSeeder(BaseSeeder):
                         csv_filename=csv_filename,
                         title=csv_filename.replace(".csv", "").replace("_", " ").title(),
                         description=f"Data file {csv_filename} belonging to {folder_name}",
-                        publication_type=PublicationType.SOFTWARE_DOCUMENTATION,
+                        publication_type=PublicationType.PLAYER,
                         publication_doi=f"10.1234/{csv_filename}",
                         tags="nba, csv, team-data",
                         uvl_version=None

@@ -1,18 +1,25 @@
 from locust import HttpUser, TaskSet, task
+import os
+import random
 
 from core.environment.host import get_host_for_locust_testing
 
 
 class FlamapyBehavior(TaskSet):
     def on_start(self):
-        self.index()
+        self.file_id = 1
 
-    @task
-    def index(self):
-        response = self.client.get("/flamapy")
+    @task(3)
+    def check_csv(self):
+        response = self.client.get(f"/flamapy/check_csv/{self.file_id}")
+        if response.status_code not in (200, 400):
+            print(f"check_csv failed: {response.status_code} for file_id {self.file_id}")
 
+    @task(2)
+    def valid(self):
+        response = self.client.get(f"/flamapy/valid/{self.file_id}")
         if response.status_code != 200:
-            print(f"Flamapy index failed: {response.status_code}")
+            print(f"valid endpoint failed: {response.status_code} for file_id {self.file_id}")
 
 
 class FlamapyUser(HttpUser):

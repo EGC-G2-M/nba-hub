@@ -1,6 +1,6 @@
 ---
-name: Feature request
-about: Plantilla de creación de nuevas issues
+name: Feature request issue
+about: Plantilla para las issues
 title: ''
 labels: ''
 assignees: ''
