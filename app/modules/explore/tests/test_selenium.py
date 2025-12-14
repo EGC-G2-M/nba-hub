@@ -30,9 +30,7 @@ class TestFilterByExtraField:
         self.wait_for_page_to_load()
         
         driver.set_window_size(706, 923)
-        
         driver.find_element(By.CSS_SELECTOR, ".sidebar-toggle").click()
-        
         driver.find_element(By.CSS_SELECTOR, ".sidebar-item:nth-child(4) .align-middle:nth-child(2)").click()
         self.wait_for_page_to_load()
         
