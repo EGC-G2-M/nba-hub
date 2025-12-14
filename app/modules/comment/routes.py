@@ -78,7 +78,8 @@ def delete_comment_route(comment_id):
 
     except Exception as e:
         flash(f"Error deleting comment: {e}", "danger")
-    return redirect(request.referrer or url_for('main.index'))
+    
+    return redirect(request.referrer or url_for('public.index'))
 
 
 @comment_bp.route("/<int:comment_id>/vote", methods=["POST"])
