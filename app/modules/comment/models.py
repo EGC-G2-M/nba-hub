@@ -28,7 +28,7 @@ class Comment(db.Model):
     # RELACIONES
     dataset_id = db.Column(db.Integer, db.ForeignKey('data_set.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('comment.id', ondelete='CASCADE'), nullable=True)
 
     user = db.relationship('User', backref='comments')
 
@@ -37,7 +37,7 @@ class Comment(db.Model):
         backref=db.backref('parent', remote_side=[id]), 
         lazy='dynamic',
         order_by='Comment.created_at.asc()',
-        primaryjoin="Comment.parent_id==Comment.id" 
+        passive_deletes=True,
     )
     
     votes = db.relationship(
