@@ -90,3 +90,18 @@ class TestTestuploaddataset():
     
     # Espera pequeña para asegurar que la petición se envía antes de cerrar el test
     time.sleep(2)
+    
+class TestTrendingDataset():
+  def setup_method(self, method):
+    self.driver = webdriver.Firefox()
+    self.vars = {}
+  
+  def teardown_method(self, method):
+    self.driver.quit()
+  
+  def test_testselenium(self):
+    self.driver.get("http://localhost:5000/")
+    self.driver.set_window_size(966, 1095)
+    self.driver.find_element(By.CSS_SELECTOR, ".sidebar-toggle").click()
+    self.driver.find_element(By.LINK_TEXT, "Trending Datasets").click()
+  
