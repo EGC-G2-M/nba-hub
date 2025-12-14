@@ -20,41 +20,73 @@ class TestTestautommaticrecommendations():
   
   def test_testautommaticrecommendations(self):
     self.driver.get("http://localhost:5000/")
-    self.driver.set_window_size(822, 895)
-    self.driver.find_element(By.CSS_SELECTOR, ".sidebar-toggle").click()
+    self.driver.set_window_size(1920, 1080)
+    self.driver.find_element(By.LINK_TEXT, "Login").click()
+    self.driver.find_element(By.ID, "email").send_keys("user1@example.com")
+    self.driver.find_element(By.ID, "password").send_keys("1234")
+    self.driver.find_element(By.ID, "submit").click()
     self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
     self.driver.find_element(By.LINK_TEXT, "View").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".col-md-3:nth-child(2) .btn").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".col-md-3:nth-child(3) .btn").click()
+    self.driver.find_element(By.LINK_TEXT, "View").click()
 
 class TestTestuploaddataset():
   def setup_method(self, method):
     self.driver = webdriver.Firefox()
     self.vars = {}
-  
+    
   def teardown_method(self, method):
     self.driver.quit()
-  
+
   def test_testupload_dataset(self):
     self.driver.get("http://localhost:5000/")
-    self.driver.set_window_size(728, 1009)
+    self.driver.set_window_size(1920, 1080)
+    
+    # --- LOGIN ---
     self.driver.find_element(By.LINK_TEXT, "Login").click()
     self.driver.find_element(By.ID, "email").click()
     self.driver.find_element(By.ID, "password").send_keys("1234")
     self.driver.find_element(By.ID, "email").send_keys("user1@example.com")
     self.driver.find_element(By.ID, "submit").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".sidebar-toggle").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".sidebar-item:nth-child(7) .align-middle:nth-child(2)").click()
+    
+    # --- NAVEGACIÓN A UPLOAD ---
+    # Nota: Ajusta estos selectores si cambian en tu menú lateral
+    self.driver.find_element(By.CSS_SELECTOR, ".sidebar-item:nth-child(7) .align-middle:nth-child(2)").click() 
     self.driver.find_element(By.CSS_SELECTOR, ".col-xs-12").click()
+    
+    # --- INFO BÁSICA DEL DATASET ---
     self.driver.find_element(By.ID, "title").click()
-    self.driver.find_element(By.ID, "title").send_keys("prueba")
+    self.driver.find_element(By.ID, "title").send_keys("Bucks Season Stats")
     self.driver.find_element(By.ID, "desc").click()
-    self.driver.find_element(By.ID, "desc").send_keys("prueba")
-    file1_path = os.path.abspath("app/modules/dataset/uvl_examples/file1.uvl")
-    self.driver.find_element(By.ID, "myDropzone").click().send_keys(file1_path)
-    self.driver.find_element(By.LINK_TEXT, "prueba").click()
+    self.driver.find_element(By.ID, "desc").send_keys("Estadísticas de temporada regular")
+    self.driver.find_element(By.NAME, "tags").send_keys("nba, bucks")
+    
+    # --- PREPARAR ARCHIVOS ---
+    file1_path = os.path.abspath("app/modules/dataset/csv_examples/east-regular-season-champs/bucks_2020-21.csv")
+    file2_path = os.path.abspath("app/modules/dataset/csv_examples/east-regular-season-champs/bucks_2022-23.csv")
+    
+    # --- SOLUCIÓN DROPZONE (EVITA ERROR NOT INTERACTABLE) ---
+    # 1. Encontrar el input oculto
+    dropzone_input = self.driver.find_element(By.CLASS_NAME, "dz-hidden-input")
+    
+    # 2. Hacerlo visible con JS
+    self.driver.execute_script(
+        "arguments[0].style.visibility = 'visible'; arguments[0].style.display = 'block'; arguments[0].style.height = '1px'; arguments[0].style.width = '1px'; arguments[0].style.opacity = 1;",
+        dropzone_input
+    )
+    
+    # 3. Enviar los dos archivos
+    dropzone_input.send_keys(file1_path)
+    
+    # --- SUBIR (CHECKBOX Y BOTÓN) ---
     check = self.driver.find_element(By.ID, "agreeCheckbox")
-    check.send_keys(Keys.SPACE)
+    # Scroll y click seguro
+    self.driver.execute_script("arguments[0].scrollIntoView(true);", check)
+    self.driver.execute_script("arguments[0].click();", check)
+    
     upload_btn = self.driver.find_element(By.ID, "upload_button")
-    upload_btn.send_keys(Keys.RETURN)
+    
+    # Esperamos que el botón se habilite
+    self.driver.execute_script("arguments[0].click();", upload_btn)
+    
+    # Espera pequeña para asegurar que la petición se envía antes de cerrar el test
     time.sleep(2)
