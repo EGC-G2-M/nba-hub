@@ -239,7 +239,7 @@ def download_dataset(dataset_id):
     return resp
 
 @dataset_bp.route("/file/count_download/<int:dataset_id>", methods=["GET"])
-def record_file_download(dataset_id):
+def download_file(dataset_id):
     dataset = dataset_service.get_or_404(dataset_id)
     user_cookie = request.cookies.get("download_cookie")
     if not user_cookie:
@@ -254,7 +254,6 @@ def record_file_download(dataset_id):
         DSDownloadRecordService().create_new_record(dataset=dataset, user_cookie=user_cookie)
         dataset_service.increment_download_count(dataset_id)
 
-    # Return a small JSON response so fetch()/AJAX callers don't receive a 404/empty response
     return jsonify({"success": True}), 200
 
 @dataset_bp.route("/datasets/<int:dataset_id>/stats", methods=["GET"])

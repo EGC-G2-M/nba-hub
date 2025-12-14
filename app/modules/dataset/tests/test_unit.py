@@ -94,7 +94,7 @@ def test_download_file_and_increment(test_client):
     test_cookie = str(uuid.uuid4())
     test_client.set_cookie("download_cookie", test_cookie)
 
-    resp = test_client.get(f"/dataset/download/{file_id}")
+    resp = test_client.get(f"/file/count_download/{file_id}")
     assert resp.status_code == 200, f"Error en descarga: {resp.data}"
 
     resp_count = test_client.get(f"/datasets/{file_id}/stats")
@@ -118,7 +118,7 @@ def test_download_file_exist_record_and_not_increment(test_client):
     db.session.add(rec)
     db.session.commit()
 
-    resp = test_client.get(f"/dataset/download/{file_id}")
+    resp = test_client.get(f"/file/count_download/{file_id}")
     assert resp.status_code == 200, f"Error en descarga: {resp.data}"
 
     resp_count = test_client.get(f"/datasets/{file_id}/stats")
