@@ -19,42 +19,24 @@ class TestCheckcsv():
     self.driver.quit()
   
   def test_checkcsv(self):
-    self.driver.get("http://localhost:5000/")
+    # Navegar directamente a la vista del dataset (más fiable que buscar en la lista)
+    self.driver.get("http://localhost:5000/doi/10.1234/spurs-ring-winners/")
     self.driver.set_window_size(1854, 923)
-    self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
-    self.driver.find_element(By.ID, "btnGroupDrop175").click()
-    self.driver.find_element(By.LINK_TEXT, "Syntax check").click()
-    WebDriverWait(self.driver, 10).until(
-      expected_conditions.visibility_of_element_located((By.ID, "check_175"))
-    )
-    badge = self.driver.find_element(By.CSS_SELECTOR, "#check_175 .badge.bg-success").text
-    assert badge.strip() == "Valid Model"
-    self.driver.find_element(By.ID, "btnGroupDrop176").click()
-    self.driver.find_element(By.LINK_TEXT, "Syntax check").click()
-    WebDriverWait(self.driver, 10).until(
-      expected_conditions.visibility_of_element_located((By.ID, "check_175"))
-    )
-    badge = self.driver.find_element(By.CSS_SELECTOR, "#check_175 .badge.bg-success").text
-    assert badge.strip() == "Valid Model"
-    self.driver.find_element(By.ID, "btnGroupDrop177").click()
-    self.driver.find_element(By.LINK_TEXT, "Syntax check").click()
-    WebDriverWait(self.driver, 10).until(
-      expected_conditions.visibility_of_element_located((By.ID, "check_175"))
-    )
-    badge = self.driver.find_element(By.CSS_SELECTOR, "#check_175 .badge.bg-success").text
-    assert badge.strip() == "Valid Model"
-    self.driver.find_element(By.ID, "btnGroupDrop178").click()
-    self.driver.find_element(By.LINK_TEXT, "Syntax check").click()
-    WebDriverWait(self.driver, 10).until(
-      expected_conditions.visibility_of_element_located((By.ID, "check_175"))
-    )
-    badge = self.driver.find_element(By.CSS_SELECTOR, "#check_175 .badge.bg-success").text
-    assert badge.strip() == "Valid Model"
-    self.driver.find_element(By.ID, "btnGroupDrop179").click()
-    self.driver.find_element(By.LINK_TEXT, "Syntax check").click()
-    WebDriverWait(self.driver, 10).until(
-      expected_conditions.visibility_of_element_located((By.ID, "check_175"))
-    )
-    badge = self.driver.find_element(By.CSS_SELECTOR, "#check_175 .badge.bg-success").text
-    assert badge.strip() == "Valid Model"
+    wait = WebDriverWait(self.driver, 10)
+
+    # Encontrar hasta 5 botones de 'Check' y ejecutar la comprobación de sintaxis para cada uno
+    # Seleccionar solamente los botones 'Check' (no los 'Export')
+    check_buttons = self.driver.find_elements(By.CSS_SELECTOR, "button[id^='btnGroupDrop']:not([id^='btnGroupDropExport'])")
+    for btn in check_buttons[:5]:
+        btn_id = btn.get_attribute('id')
+        # Extraer el id numérico del archivo asociado
+        file_id = btn_id.replace('btnGroupDrop', '')
+        # Abrir el menú y seleccionar 'Syntax check' dentro del menú específico
+        btn.click()
+        menu_anchor = self.driver.find_element(By.CSS_SELECTOR, f"ul[aria-labelledby='{btn_id}'] a")
+        menu_anchor.click()
+        # Esperar que el área de comprobación para ese archivo sea visible
+        wait.until(expected_conditions.visibility_of_element_located((By.ID, f"check_{file_id}")))
+        badge = self.driver.find_element(By.CSS_SELECTOR, f"#check_{file_id} .badge.bg-success").text
+        assert badge.strip() == "Valid Model"
   

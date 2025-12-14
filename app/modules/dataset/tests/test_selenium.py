@@ -10,6 +10,62 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+class TestCounterselenium():
+  def setup_method(self, method):
+    self.driver = webdriver.Firefox()
+    self.vars = {}
+  
+  def teardown_method(self, method):
+    self.driver.quit()
+  
+  def wait_for_window(self, timeout = 2):
+    time.sleep(round(timeout / 1000))
+    wh_now = self.driver.window_handles
+    wh_then = self.vars["window_handles"]
+    if len(wh_now) > len(wh_then):
+      return set(wh_now).difference(set(wh_then)).pop()
+  def get_downloads_count(self):
+    text = self.driver.find_element(By.ID, "dataset_downloads_count").text
+    return int(text.split(":")[1].strip())
+
+  
+  def test_counterselenium(self):
+
+    wait = WebDriverWait(self.driver, 10)
+
+
+    self.driver.get("http://localhost:5000/")
+    self.driver.set_window_size(1854, 923)
+
+    #DESCARGAR DESDE VISTA DATASETS Y NO INCREMENTA CON OTRAS ACCIONES
+    self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
+        
+    wait.until(expected_conditions.presence_of_element_located((By.ID, "dataset_downloads_count")))
+    initial_downloads = self.get_downloads_count()
+    
+    self.driver.find_element(By.CSS_SELECTOR, ".d-block").click()
+    self.driver.find_element(By.LINK_TEXT, "Download (2.65 KB)").click()
+    self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
+
+    wait.until(lambda d: self.get_downloads_count() == initial_downloads + 1)
+    downloads_after_single = self.get_downloads_count()
+    
+    assert downloads_after_single == initial_downloads + 1
+
+    elem = wait.until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, '[id^="btnGroupDropExport"]')))
+    elem.click()
+    wait.until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, "CSV"))).click()
+    self.driver.find_element(By.CSS_SELECTOR, ".col-xl-8").click()
+    self.driver.find_element(By.LINK_TEXT, "Download all (2.65 KB)").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".card:nth-child(2) > .card-body").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".d-block").click()
+    self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
+        
+    wait.until(expected_conditions.presence_of_element_located((By.ID, "dataset_downloads_count")))
+    final_downloads = self.get_downloads_count()
+
+    assert final_downloads == downloads_after_single
+
 class TestTestautommaticrecommendations():
   def setup_method(self, method):
     self.driver = webdriver.Firefox()
@@ -103,5 +159,7 @@ class TestTrendingDataset():
     self.driver.get("http://localhost:5000/")
     self.driver.set_window_size(966, 1095)
     self.driver.find_element(By.CSS_SELECTOR, ".sidebar-toggle").click()
+    wait = WebDriverWait(self.driver, 10)
+    wait.until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, "Trending Datasets")))
     self.driver.find_element(By.LINK_TEXT, "Trending Datasets").click()
   
