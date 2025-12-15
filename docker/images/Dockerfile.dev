@@ -20,7 +20,29 @@ RUN apt-get install -y --no-install-recommends ca-certificates gnupg lsb-release
     && apt-get update \
     && apt-get install -y --no-install-recommends docker-ce-cli 
 
-# Clean up
+# --- NUEVO: INSTALACIÓN DE FIREFOX Y GECKODRIVER PARA SELENIUM ---
+# 1. Instalar Firefox ESR y dependencias del sistema (GTK, X11, Audio, etc.)
+RUN apt-get install -y --no-install-recommends \
+    firefox-esr \
+    wget \
+    tar \
+    bzip2 \
+    libxtst6 \
+    libgtk-3-0 \
+    libdbus-glib-1-2 \
+    libx11-xcb1 \
+    libdbus-1-3 \
+    libasound2
+
+# 2. Instalar Geckodriver (Driver para controlar Firefox)
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz \
+    && tar -xvzf geckodriver-v0.34.0-linux64.tar.gz \
+    && chmod +x geckodriver \
+    && mv geckodriver /usr/local/bin/ \
+    && rm geckodriver-v0.34.0-linux64.tar.gz
+# --- FIN DEL BLOQUE NUEVO ---
+
+# Clean up (Limpiamos caché después de instalar todo)
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/*
         

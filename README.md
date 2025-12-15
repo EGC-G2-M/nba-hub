@@ -48,22 +48,32 @@ Below are the three methods for running the application, depending on your envir
 
 Utilizing Docker is the fastest and cleanest way to run the application, as it manages all dependencies and the environment internally, based on the `Dockerfile` and `docker-compose.yml` files in the repository, guaranteeing consistency.
 
-1.  **Build and Run the Container:**
+1.  **Stop MariaDB:**
+    Ensure you have stopped mariadb server:
+
+    ```bash
+    sudo systemctl stop mariadb
+    ```
+
+2.  **Build and Run the Container:**
     Ensure you are in the root directory of the repository (`nba-hub`) and execute:
 
     ```bash
-    docker-compose up
+    cp .env.docker.example .env
+    ```
+    ```bash
+    docker compose -f docker/docker-compose.dev.yml up -d --build
     ```
 
 2.  **Access the Application:**
     Once the container is up, the application will be available in your browser at:
     [http://localhost:5000](http://localhost:5000)
 
-3.  **Stop the Container:**
+4.  **Stop the Container:**
     When you are finished, you can stop and remove the container with:
 
     ```bash
-    docker-compose down
+    docker compose -f docker/docker-compose.dev.yml down -v
     ```
 
 ### Option 2: Vagrant (Virtual Machine)
@@ -91,15 +101,19 @@ This option allows you to package a complete and isolated development environmen
 
 If you prefer to run the project directly in your local environment, you must have **Python** and a virtual environment set up.
 
+1.  **Activate local enviroment:**
+    Copy enviroment configuration using this command:
+
+    ```bash
+    cp .env.local.example .env
+    ```
 1.  **Install Dependencies:**
     It is highly recommended to create and activate a virtual environment before installing requirements:
 
     ```bash
-    # 1. Create and activate virtual environment
     python3 -m venv venv
-    source venv/bin/activate  # For Linux/macOS
-    # or: .\venv\Scripts\activate  # For Windows
     ```
+
     If you have Linux or macOS activate the virtual enviroment like this:
     ```bash
     source venv/bin/activate
