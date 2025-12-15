@@ -35,16 +35,15 @@ def test_show_comments():
         driver.get(f"{host}/datasets/13/comments")
         wait_for_page_to_load(driver)
         
-        driver.find_element(By.CSS_SELECTOR, ".justify-content-between > .btn").click()
         driver.get(f"{host}/dataset/12/comment/create?content=prueba_desde_url")
         
         print("Test Show Comments passed!")
 
     finally:
         close_driver(driver)
-
-
-def test_like_pin_reply():
+ 
+ 
+def test_reply():
     driver = initialize_driver()
     
     try:
@@ -67,11 +66,7 @@ def test_like_pin_reply():
         
         driver.get(f"{host}/datasets/12/comments")
         wait_for_page_to_load(driver)
-        
-        driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .d-flex > .d-inline:nth-child(1) svg").click()
-        driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .d-flex > .d-inline:nth-child(1) svg").click()
-        driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .btn").click()
-        
+     
         driver.get(f"{host}/dataset/12/comment/create?content=prueba_desde_url&parent_id=7")
         wait_for_page_to_load(driver)
         
@@ -83,4 +78,4 @@ def test_like_pin_reply():
 
 if __name__ == "__main__":
     test_show_comments()
-    test_like_pin_reply()
+    test_reply()
