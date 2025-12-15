@@ -9,7 +9,10 @@
   - [Option 1: Docker (Recommended)](#option-1-docker-recommended)
   - [Option 2: Vagrant (Virtual Machine)](#option-2-vagrant-virtual-machine)
   - [Option 3: Local Execution with Flask](#option-3-local-execution-with-flask)
-- [Running Tests](#-testing)
+- [Testing](#-testing)
+  - [Local environment](#local-environment)
+  - [Docker environment](#docker-environment)
+  - [Vagrant environment](#vagrant-environment)
 
 
 ##  Introduction
@@ -102,19 +105,19 @@ Copy the example Vagrant configuration file to the production `.env` file.
     cp .env.vagrant.example .env
     ```
 
-2. **Activate the virtual environment**:
-
-    ```bash
-    source /home/vagrant/.venv/bin/activate
-    ```
-
-3.  **Start the Virtual Machine:**
+2.  **Start the Virtual Machine:**
     From the root of the repository, execute:
 
     ```bash
     vagrant up
     ```
     This will download, configure, and start the virtual machine, installing all necessary dependencies as provisioned in the `Vagrantfile`.
+
+3. **Activate the virtual environment**:
+
+    ```bash
+    source /home/vagrant/.venv/bin/activate
+    ```
 
 4. **Access via ssh to VM:**
 
@@ -203,12 +206,12 @@ To run the tests using Docker, it is necessary to do an aditional step:
 docker exec -it web_app_container bash
 ```
 
-#### Unit and Integration Tests
+#### Unit, Integration and GUI tests
 
-Use the following command from the root directory of the container:
+To run unit, integration and GUI tests using the `pytest` framework, use the following command from the root directory of the container:
 
 ```bash
-rosemary test <module> # ommit <module> to run all tests
+pytest -v
 ```
 
 #### Load Tests
@@ -217,14 +220,6 @@ Use the following command from the root directory of the container:
 
 ```bash
 rosemary locust <module> # ommit <module> to run all tests 
-```
-
-#### GUI Tests
-
-Use the following command from the root directory of the container:
-
-```bash
-rosemary selenium <module> # ommit <module> to run all tests
 ```
 
 ### Vagrant environment
@@ -237,10 +232,11 @@ cd /vagrant
 
 to change the working directory to the shared folder.
 
-#### Unit and Integration Tests
+#### Unit, Integration and GUI Tests
 
-To run unit and integration tests using the `pytest` framework, use the following command from the root directory:
+To run unit, integration and GUI tests using the `pytest` framework, use the following command from the root directory of the VM with the virtual environment activated:
 
 ```bash
-rosemary test <module> # ommit <module> to run all tests
+pytest -v
 ```
+
