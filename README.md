@@ -99,10 +99,16 @@ sudo apt install vagrant virtualbox
 Copy the example Vagrant configuration file to the production `.env` file.
 
     ```bash
-    cp ./.env.vagrant.example .env
+    cp .env.vagrant.example .env
     ```
 
-2.  **Start the Virtual Machine:**
+2. **Activate the virtual environment**:
+
+    ```bash
+    source /home/vagrant/.venv/bin/activate
+    ```
+
+3.  **Start the Virtual Machine:**
     From the root of the repository, execute:
 
     ```bash
@@ -110,11 +116,17 @@ Copy the example Vagrant configuration file to the production `.env` file.
     ```
     This will download, configure, and start the virtual machine, installing all necessary dependencies as provisioned in the `Vagrantfile`.
 
-3.  **Access the Application:**
+4. **Access via ssh to VM:**
+
+    ```bash
+    vagrant ssh
+    ```
+
+5.  **Access the Application:**
     The application runs inside the VM and is accessed via port forwarding. By default, look for the application at:
     [http://localhost:5000](http://localhost:5000) (Verify the forwarded port in your Vagrant configuration).
 
-4.  **Stop/Destroy the Machine:**
+6.  **Stop/Destroy the Machine:**
     * To suspend the VM (save state): `vagrant suspend`
     * To stop the VM: `vagrant halt`
     * To completely remove the VM and free up resources: `vagrant destroy`
@@ -163,11 +175,72 @@ If you prefer to run the project directly in your local environment, you must ha
 
 ## Testing
 
-The project includes unit and integration tests to ensure the application's stability and correctness. We recommend executing tests within the same environment where the dependencies were installed (either local virtual environment or inside the Docker container/Vagrant VM).
+The project includes unit, integration, load and GUI tests to ensure the application's stability and correctness. We recommend executing tests within the same environment where the dependencies were installed (either local virtual environment or inside the Docker container/Vagrant VM).
 
-### Executing Tests
+### Local environment
 
-To run all tests using the `pytest` framework, use the following command from the root directory:
+#### Unit, Integration and GUI tests
+
+To run unit, integration and GUI tests using the `pytest` framework, use the following command from the root directory:
 
 ```bash
-pytest
+pytest -v
+```
+
+#### Load tests
+
+To run load tests, use the following command from the root directory:
+
+```bash
+rosemary locust <module> # ommit <module> to run all tests
+```
+
+### Docker environment
+
+To run the tests using Docker, it is necessary to do an aditional step:
+
+```bash
+docker exec -it web_app_container bash
+```
+
+#### Unit and Integration Tests
+
+Use the following command from the root directory of the container:
+
+```bash
+rosemary test <module> # ommit <module> to run all tests
+```
+
+#### Load Tests
+
+Use the following command from the root directory of the container:
+
+```bash
+rosemary locust <module> # ommit <module> to run all tests 
+```
+
+#### GUI Tests
+
+Use the following command from the root directory of the container:
+
+```bash
+rosemary selenium <module> # ommit <module> to run all tests
+```
+
+### Vagrant environment
+
+To run the tests using Vagrant, it is necessary to do an aditional step:
+
+```bash
+cd /vagrant
+```
+
+to change the working directory to the shared folder.
+
+#### Unit and Integration Tests
+
+To run unit and integration tests using the `pytest` framework, use the following command from the root directory:
+
+```bash
+rosemary test <module> # ommit <module> to run all tests
+```
