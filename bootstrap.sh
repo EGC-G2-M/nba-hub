@@ -16,6 +16,16 @@ sudo apt-get update
 # Se añade libmysqlclient-dev que suele ser necesaria para compilar el driver de DB
 sudo apt-get install -y mariadb-server python3-pip python3-venv git python3-dev libmysqlclient-dev
 
+# Instalación de Firefox y geckodriver para tests de Selenium
+echo "--- Instalando Firefox y geckodriver para Selenium ---"
+sudo apt-get install -y firefox
+# Descargar geckodriver
+wget -q https://github.com/mozilla/geckodriver/releases/download/v0.35.0/geckodriver-v0.35.0-linux64.tar.gz
+sudo tar -xzf geckodriver-v0.35.0-linux64.tar.gz -C /usr/local/bin/
+sudo chmod +x /usr/local/bin/geckodriver
+rm geckodriver-v0.35.0-linux64.tar.gz
+echo "✅ Firefox y geckodriver instalados"
+
 # --- 3. Configuración de MariaDB ---
 echo "--- 3. Configurando MariaDB ---"
 sudo systemctl enable mariadb

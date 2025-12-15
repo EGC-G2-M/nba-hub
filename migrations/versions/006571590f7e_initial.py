@@ -1,8 +1,8 @@
-"""first migration
+"""initial
 
-Revision ID: 001
+Revision ID: 006571590f7e
 Revises: 
-Create Date: 2024-09-08 16:50:20.326640
+Create Date: 2025-12-15 23:31:22.975944
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '001'
+revision = '006571590f7e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,6 +30,10 @@ def upgrade():
     sa.Column('number_of_features', sa.String(length=120), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('fakenodo',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('fm_metrics',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('solver', sa.Text(), nullable=True),
@@ -41,12 +45,11 @@ def upgrade():
     sa.Column('email', sa.String(length=256), nullable=False),
     sa.Column('password', sa.String(length=256), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('two_factor_secret', sa.LargeBinary(), nullable=True),
+    sa.Column('two_factor_enabled', sa.Boolean(), nullable=True),
+    sa.Column('is_admin', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
-    )
-    op.create_table('webhook',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('zenodo',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -61,6 +64,7 @@ def upgrade():
     sa.Column('publication_doi', sa.String(length=120), nullable=True),
     sa.Column('dataset_doi', sa.String(length=120), nullable=True),
     sa.Column('tags', sa.String(length=120), nullable=True),
+    sa.Column('extra_fields', sa.String(length=120), nullable=True),
     sa.Column('ds_metrics_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['ds_metrics_id'], ['ds_metrics.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -105,7 +109,25 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('ds_meta_data_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('download_count', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['ds_meta_data_id'], ['ds_meta_data.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('comment',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('likes', sa.Integer(), nullable=True),
+    sa.Column('dislikes', sa.Integer(), nullable=True),
+    sa.Column('is_pinned', sa.Boolean(), nullable=True),
+    sa.Column('is_hidden', sa.Boolean(), nullable=True),
+    sa.Column('is_reported', sa.Boolean(), nullable=True),
+    sa.Column('dataset_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('parent_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['dataset_id'], ['data_set.id'], ),
+    sa.ForeignKeyConstraint(['parent_id'], ['comment.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -136,6 +158,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['data_set_id'], ['data_set.id'], ),
     sa.ForeignKeyConstraint(['fm_meta_data_id'], ['fm_meta_data.id'], ),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('comment_vote',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('comment_id', sa.Integer(), nullable=False),
+    sa.Column('vote_type', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['comment_id'], ['comment.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('user_id', 'comment_id')
     )
     op.create_table('file',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -174,18 +204,20 @@ def downgrade():
     op.drop_table('file_view_record')
     op.drop_table('file_download_record')
     op.drop_table('file')
+    op.drop_table('comment_vote')
     op.drop_table('feature_model')
     op.drop_table('ds_view_record')
     op.drop_table('ds_download_record')
+    op.drop_table('comment')
     op.drop_table('data_set')
     op.drop_table('author')
     op.drop_table('user_profile')
     op.drop_table('fm_meta_data')
     op.drop_table('ds_meta_data')
     op.drop_table('zenodo')
-    op.drop_table('webhook')
     op.drop_table('user')
     op.drop_table('fm_metrics')
+    op.drop_table('fakenodo')
     op.drop_table('ds_metrics')
     op.drop_table('doi_mapping')
     # ### end Alembic commands ###
