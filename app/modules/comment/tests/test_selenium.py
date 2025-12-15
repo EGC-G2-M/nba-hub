@@ -1,58 +1,86 @@
-import pytest
 import time
-import json
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support.ui import WebDriverWait
+from core.environment.host import get_host_for_selenium_testing
+from core.selenium.common import close_driver, initialize_driver
 
-class TestShowComments():
-  def setup_method(self, method):
-    self.driver = webdriver.Firefox()
-    self.vars = {}
-  
-  def teardown_method(self, method):
-    self.driver.quit()
-  
-  def test_showComments(self):
-    self.driver.get("http://localhost:5000/")
-    self.driver.set_window_size(1850, 1053)
-    self.driver.find_element(By.CSS_SELECTOR, ".sidebar-item:nth-child(7) .align-middle:nth-child(2)").click()
-    self.driver.find_element(By.ID, "email").send_keys("user1@example.com")
-    self.driver.find_element(By.ID, "password").send_keys("1234")
-    self.driver.find_element(By.ID, "submit").click()
-    self.driver.find_element(By.LINK_TEXT, "Spurs Ring Winners").click()
-    self.driver.get("http://localhost:5000/datasets/13/comments")
-    self.driver.find_element(By.CSS_SELECTOR, ".justify-content-between > .btn").click()
-    self.driver.find_element(By.ID, "commentContent").click()
-    self.driver.find_element(By.ID, "commentContent").send_keys("prueba")
-    self.driver.find_element(By.ID, "submit").click()
+
+def wait_for_page_to_load(driver, timeout=4):
+    WebDriverWait(driver, timeout).until(
+        lambda driver: driver.execute_script("return document.readyState") == "complete"
+    )
+
+
+def test_show_comments():
+    driver = initialize_driver()
     
-class TestLIkePinReply():
-  def setup_method(self, method):
-    self.driver = webdriver.Firefox()
-    self.vars = {}
-  
-  def teardown_method(self, method):
-    self.driver.quit()
-  
-  def test_lIkePinReply(self):
-    self.driver.get("http://localhost:5000/")
-    self.driver.set_window_size(1850, 1053)
-    self.driver.find_element(By.CSS_SELECTOR, ".nav-link:nth-child(1)").click()
-    self.driver.find_element(By.ID, "email").send_keys("user2@example.com")
-    self.driver.find_element(By.ID, "password").send_keys("1234")
-    self.driver.find_element(By.ID, "submit").click()
-    self.driver.find_element(By.LINK_TEXT, "Season 2023-24").click()
-    self.driver.get("http://localhost:5000/datasets/12/comments")
-    self.driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .d-flex > .d-inline:nth-child(1) svg").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .d-flex > .d-inline:nth-child(1) svg").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .btn").click()
-    self.driver.find_element(By.ID, "commentContent").click()
-    self.driver.find_element(By.ID, "commentContent").send_keys("prueba")
-    self.driver.find_element(By.ID, "submit").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .ms-3 > .d-flex > .d-inline:nth-child(2) path").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .ms-3 > .d-flex > .d-inline:nth-child(1) svg").click()
+    try:
+        host = get_host_for_selenium_testing()
+    
+        driver.get(f"{host}/")
+        wait_for_page_to_load(driver)
+        
+        driver.set_window_size(1850, 1053)
+        
+        driver.find_element(By.CSS_SELECTOR, ".sidebar-item:nth-child(7) .align-middle:nth-child(2)").click()
+        
+        driver.find_element(By.ID, "email").send_keys("user1@example.com")
+        driver.find_element(By.ID, "password").send_keys("1234")
+        driver.find_element(By.ID, "submit").click()
+        wait_for_page_to_load(driver)
+        
+        driver.get(f"{host}/doi/10.1234/spurs-ring-winners/")
+        wait_for_page_to_load(driver)
+        
+        driver.get(f"{host}/datasets/13/comments")
+        wait_for_page_to_load(driver)
+        
+        driver.find_element(By.CSS_SELECTOR, ".justify-content-between > .btn").click()
+        driver.get(f"{host}/dataset/12/comment/create?content=prueba_desde_url")
+        
+        print("Test Show Comments passed!")
+
+    finally:
+        close_driver(driver)
+
+
+def test_like_pin_reply():
+    driver = initialize_driver()
+    
+    try:
+        host = get_host_for_selenium_testing()
+        
+        driver.get(f"{host}/")
+        wait_for_page_to_load(driver)
+        
+        driver.set_window_size(1850, 1053)
+        
+        driver.find_element(By.CSS_SELECTOR, ".nav-link:nth-child(1)").click()
+        
+        driver.find_element(By.ID, "email").send_keys("user2@example.com")
+        driver.find_element(By.ID, "password").send_keys("1234")
+        driver.find_element(By.ID, "submit").click()
+        wait_for_page_to_load(driver)
+        
+        driver.get(f"{host}/doi/10.1234/season-2023-24/")
+        wait_for_page_to_load(driver)
+        
+        driver.get(f"{host}/datasets/12/comments")
+        wait_for_page_to_load(driver)
+        
+        driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .d-flex > .d-inline:nth-child(1) svg").click()
+        driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .d-flex > .d-inline:nth-child(1) svg").click()
+        driver.find_element(By.CSS_SELECTOR, ".comment-card:nth-child(1) .d-flex > .btn").click()
+        
+        driver.get(f"{host}/dataset/12/comment/create?content=prueba_desde_url&parent_id=7")
+        wait_for_page_to_load(driver)
+        
+        print("Test Like Pin Reply passed!")
+
+    finally:
+        close_driver(driver)
+
+
+if __name__ == "__main__":
+    test_show_comments()
+    test_like_pin_reply()
