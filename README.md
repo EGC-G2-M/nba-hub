@@ -9,7 +9,10 @@
   - [Option 1: Docker (Recommended)](#option-1-docker-recommended)
   - [Option 2: Vagrant (Virtual Machine)](#option-2-vagrant-virtual-machine)
   - [Option 3: Local Execution with Flask](#option-3-local-execution-with-flask)
-- [Running Tests](#-testing)
+- [Testing](#-testing)
+  - [Local environment](#local-environment)
+  - [Docker environment](#docker-environment)
+  - [Vagrant environment](#vagrant-environment)
 
 
 ##  Introduction
@@ -27,10 +30,9 @@ Before proceeding with the download and execution, ensure you have the following
 | Requirement | Purpose | Required For |
 | :--- | :--- | :--- |
 | **Git** | Cloning the repository. | All |
-| **Python 3.x** | Local execution (Flask) and dependency installation. | Flask |
+| **Python `3.x`** | Local execution (Flask) and dependency installation. | Flask |
 | **Docker & Docker Compose** | Building and running the container. | Docker |
-| **Vagrant & VirtualBox** | Spinning up the development virtual machine. | Vagrant |
-
+| **Vagrant `2.4.x` or higher & VirtualBox `7.0.x` or higher** | Spinning up the development virtual machine. | Vagrant |
 
 ## Cloning the Repository
 
@@ -80,7 +82,30 @@ Utilizing Docker is the fastest and cleanest way to run the application, as it m
 
 This option allows you to package a complete and isolated development environment in a virtual machine using VirtualBox, ensuring the host system remains clean.
 
-1.  **Start the Virtual Machine:**
+#### Linux (Ubuntu/Debian)
+
+Install **Vagrant** and **VirtualBox** with:
+
+```bash
+sudo apt install vagrant virtualbox
+```
+
+#### Recommended Versions
+
+> ⚠️ Using older versions may cause unexpected errors.
+
+
+
+### Project Setup
+
+1. Configure Environment Variables
+Copy the example Vagrant configuration file to the production `.env` file.
+
+    ```bash
+    cp .env.vagrant.example .env
+    ```
+
+2.  **Start the Virtual Machine:**
     From the root of the repository, execute:
 
     ```bash
@@ -88,11 +113,23 @@ This option allows you to package a complete and isolated development environmen
     ```
     This will download, configure, and start the virtual machine, installing all necessary dependencies as provisioned in the `Vagrantfile`.
 
-2.  **Access the Application:**
+3. **Activate the virtual environment**:
+
+    ```bash
+    source /home/vagrant/.venv/bin/activate
+    ```
+
+4. **Access via ssh to VM:**
+
+    ```bash
+    vagrant ssh
+    ```
+
+5.  **Access the Application:**
     The application runs inside the VM and is accessed via port forwarding. By default, look for the application at:
     [http://localhost:5000](http://localhost:5000) (Verify the forwarded port in your Vagrant configuration).
 
-3.  **Stop/Destroy the Machine:**
+6.  **Stop/Destroy the Machine:**
     * To suspend the VM (save state): `vagrant suspend`
     * To stop the VM: `vagrant halt`
     * To completely remove the VM and free up resources: `vagrant destroy`
@@ -141,11 +178,65 @@ If you prefer to run the project directly in your local environment, you must ha
 
 ## Testing
 
-The project includes unit and integration tests to ensure the application's stability and correctness. We recommend executing tests within the same environment where the dependencies were installed (either local virtual environment or inside the Docker container/Vagrant VM).
+The project includes unit, integration, load and GUI tests to ensure the application's stability and correctness. We recommend executing tests within the same environment where the dependencies were installed (either local virtual environment or inside the Docker container/Vagrant VM).
 
-### Executing Tests
+### Local environment
 
-To run all tests using the `pytest` framework, use the following command from the root directory:
+#### Unit, Integration and GUI tests
+
+To run unit, integration and GUI tests using the `pytest` framework, use the following command from the root directory:
 
 ```bash
-pytest
+pytest -v
+```
+
+#### Load tests
+
+To run load tests, use the following command from the root directory:
+
+```bash
+rosemary locust <module> # ommit <module> to run all tests
+```
+
+### Docker environment
+
+To run the tests using Docker, it is necessary to do an aditional step:
+
+```bash
+docker exec -it web_app_container bash
+```
+
+#### Unit, Integration and GUI tests
+
+To run unit, integration and GUI tests using the `pytest` framework, use the following command from the root directory of the container:
+
+```bash
+pytest -v
+```
+
+#### Load Tests
+
+Use the following command from the root directory of the container:
+
+```bash
+rosemary locust <module> # ommit <module> to run all tests 
+```
+
+### Vagrant environment
+
+To run the tests using Vagrant, it is necessary to do an aditional step:
+
+```bash
+cd /vagrant
+```
+
+to change the working directory to the shared folder.
+
+#### Unit, Integration and GUI Tests
+
+To run unit, integration and GUI tests using the `pytest` framework, use the following command from the root directory of the VM with the virtual environment activated:
+
+```bash
+pytest -v
+```
+
