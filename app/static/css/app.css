@@ -13347,7 +13347,7 @@ screen and (-ms-high-contrast:active) {
 
 .sidebar,
 .sidebar-content {
-    background: #090030;
+    background: var(--bs-purple);
     transition: margin-left .35s ease-in-out, left .35s ease-in-out, margin-right .35s ease-in-out, right .35s ease-in-out
 }
 
@@ -13366,7 +13366,7 @@ screen and (-ms-high-contrast:active) {
 
 .sidebar-link,
 a.sidebar-link {
-    background: #090030;
+    background: var(--bs-purple);
     border-left: 3px solid transparent;
     color: rgba(233, 236, 239, .5);
     cursor: pointer;
